@@ -20,7 +20,7 @@ const NoteView = () => {
           <View style={{ flexDirection: "column", margin: 10 }}>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
               <Image
-                source={require("../image_view/image_avt.jpg")}
+                source={require("../onHome/image_view/image_avt.jpg")}
                 style={{ height: 50, width: 50, borderRadius: "50%" }}
                 resizeMode='cover'
               ></Image>
@@ -75,7 +75,7 @@ const NoteView = () => {
               >
                 <View style={{ height: 150, width: 90, borderRadius: 10, overflow: 'hidden' }}>
                   <Image
-                    source={require("../image_view/image_avt.jpg")}
+                    source={require("../onHome/image_view/image_avt.jpg")}
                     style={{ position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }}
                     resizeMode='cover'
                   />
@@ -92,7 +92,7 @@ const NoteView = () => {
               >
                 <View style={{ height: 150, width: 90, borderRadius: 10, overflow: 'hidden' }}>
                   <Image
-                    source={require("../image_view/image_avt.jpg")}
+                    source={require("../onHome/image_view/image_avt.jpg")}
                     style={{ position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }}
                     resizeMode='cover'
                   />
@@ -109,7 +109,7 @@ const NoteView = () => {
               >
                 <View style={{ height: 150, width: 90, borderRadius: 10, overflow: 'hidden' }}>
                   <Image
-                    source={require("../image_view/image_avt.jpg")}
+                    source={require("../onHome/image_view/image_avt.jpg")}
                     style={{ position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }}
                     resizeMode='cover'
                   />
@@ -126,7 +126,7 @@ const NoteView = () => {
               >
                 <View style={{ height: 150, width: 90, borderRadius: 10, overflow: 'hidden' }}>
                   <Image
-                    source={require("../image_view/image_avt.jpg")}
+                    source={require("../onHome/image_view/image_avt.jpg")}
                     style={{ position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }}
                     resizeMode='cover'
                   />
@@ -150,7 +150,7 @@ const NoteView = () => {
             <View style={{ flexDirection: "row", justifyContent: "center" }}>
               <View style={{ flexDirection: "column" }}>
                 <Image
-                  source={require("../image_view/shiba_avt.jpg")}
+                  source={require("../onHome/image_view/shiba_avt.jpg")}
                   style={{ height: 40, width: 40, borderRadius: "50%" }}
                   resizeMode='cover'
                 ></Image>
@@ -172,7 +172,7 @@ const NoteView = () => {
           {/* chứa ảnh, video */}
           <View style={{ flexDirection: "column" }}>
             <Image
-              source={require("../image_view/baidang_01.jpg")}
+              source={require("../onHome/image_view/baidang_01.jpg")}
               style={{ height: 300, width: 400 }}
               resizeMode='cover'
             ></Image>

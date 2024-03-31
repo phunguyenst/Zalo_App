@@ -13,7 +13,7 @@ const HeaderChat = ({navigation}) => {
       colors={['#247bfe', '#139afc', '#02b9fa']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      style={{ height: 60, justifyContent: 'center', paddingHorizontal: 10 }}
+      style={{ height: 60, justifyContent: 'center', paddingHorizontal: 10, }}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
       <TouchableOpacity onPress={() => navigation.goBack()} >

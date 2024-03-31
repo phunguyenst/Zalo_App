@@ -15,95 +15,109 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { readUser } from "../userSlice";
+import { readConversation } from "../slide/ConsevationSlide";
 import { useDispatch, useSelector } from "react-redux"
+import { selectAuthorization } from "../slide/LoginSlide";
+import { setConversationDetails } from "../slide/ConsevationSlide";
+
+import axios from 'axios';
 const ChatView = ({ navigation, route }) => {
-  const list = [
-    {
-      id: 1,
-      name: 'John',
-      image: require("../image_view/avtchat_01.jpg"),
-      message: 'Hello, how are you?'
-    },
-    {
-      id: 2,
-      name: 'Bob',
-      message: 'I am good, thank you.',
-      image: require("../image_view/avtchat_02.jpg"),
-
-    },
-    {
-      id: 3,
-      name: "Jack",
-      image: require("../image_view/avtchat_03.jpg"),
-      message: 'Where are you now?'
-    },
-    {
-      id: 4,
-      name: "Conor",
-      image: require("../image_view/avtchat_04.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 5,
-      name: "Khabib",
-      image: require("../image_view/avtchat_05.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 6,
-      name: "Anable",
-      image: require("../image_view/avtchat_06.jpg"),
-      message: 'I am watch tv.',
-    },
-    {
-      id: 7,
-      name: "Tony",
-      image: require("../image_view/avtchat_07.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 8,
-      name: "Dustin",
-      image: require("../image_view/avtchat_08.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 9,
-      name: "Max",
-      image: require("../image_view/avtchat_09.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 10,
-      name: "Jon",
-      image: require("../image_view/avtchat_10.jpg"),
-      message: 'I am in the office.'
-    },
-    
-  ]
+  
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.data);
+  const currentConversation = useSelector((state) => state.conversations);
   const [listmess, setList] = useState([])
- 
-  useEffect(() =>{
-    fetch('https://6571a1fed61ba6fcc01322aa.mockapi.io/user')
-    .then(response => response.json())
-    .then(data => {
-      console.log("data");
-
-      console.log(data);
-      if(data){
-        dispatch(readUser(data));
-        setList(data);
+  const authorization = useSelector(selectAuthorization);
+ console.log("authorization" + authorization);
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/conversation/', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const formattedData = data.conversations.map(conversation => {
+          const conversationId = conversation.conversationId;
+          const participantIds = conversation.participantIds;
+          dispatch(setConversationDetails({ conversationId, participantIds }));
+          return conversation.membersInfo.map(member => {
+            // const userID = data.conversations[0].userID;
+            // dispatch(setConversationDetails(userID));
+            return {
+              id: conversation.userID,
+              name: member.fullName,
+              image: member.profilePic,
+              message: conversation.lastMessage,
+            }
+          })
+        }).flat();
+        
+        
+        dispatch(readConversation(formattedData));
+        setList(formattedData);
+      } else {
+        // Xử lý lỗi khi fetch không thành công
       }
-    })
-    .catch(error => {
-        console.error('Error fetching data: ', error);
-        return error;
-    });
-    // dispatch(readUser())
-  }, [])
+    } catch (error) {
+      // Xử lý lỗi khi fetch gặp lỗi
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  fetchData();
+
+}, []);
+
+  
+  
+  // useEffect(() =>{
+  //   fetch('https://6571a1fed61ba6fcc01322aa.mockapi.io/user')
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     console.log("data");
+
+  //     console.log(data);
+  //     if(data){
+  //       // dispatch(readUser(data));
+        
+  //       setList(data);
+  //     }
+  //   })
+  //   .catch(error => {
+  //       console.error('Error fetching data: ', error);
+  //       return error;
+  //   });
+   
+  // }, [])
+  
+
+  // useEffect(() => {
+  //   axios.get('http://localhost:5000/api/conversation/', {
+  //     headers: {
+  //       Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0aGFuaHRpbiIsInN1YiI6Iis4NDMzNDEyNzQ0NSIsImlhdCI6MTcwODc3ODg4MzcxOCwiZXhwIjoxNzExMzcwODgzNzE4fQ.50uuWd6LeSHg_h_e1IzVADPjqK5FWYvx0MNAttlxNsc'
+  //     }
+  //   })
+    
+  //   .then(response => {
+  //     console.log("data");
+  //     console.log(response.data);
+  //     console.log(`HTTP status code on success: ${response.status}`);
+  //     // if(response.data){
+  //     //   dispatch(readUser(response.data));
+  //     //   setList(response.data);
+  //     // }
+  //     setList(response.data);
+  //   })
+  //   .catch(error => {
+  //     console.error('Error fetching data: ', error);
+  //     if (error.response) {
+  //       console.error(`HTTP status code on error: ${error.response.status}`);
+  //     }
+  //   });
+  // }, [])
 
   return (
     <View style={styles.container}>
@@ -113,7 +127,7 @@ const ChatView = ({ navigation, route }) => {
         >
           <FlatList
             data={listmess}
-            keyExtractor={(item) => item.id.toString()}
+            // keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
@@ -146,7 +160,8 @@ const ChatView = ({ navigation, route }) => {
                   <Card>
                     <Card.Content>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Avatar.Image size={55} source={require(`../image_view/${item.image}`)} style={{ marginRight: 10 }} />
+                        {/* <Avatar.Image size={55} source={require(`../image_view/${item.image}`)} style={{ marginRight: 10 }} /> */}
+                        <Avatar.Image size={55} source={{uri: item.image}} style={{ marginRight: 10 }} />
                         <View style={{ flex: 1 }}>
                           <Card.Title
                             title={item.name}

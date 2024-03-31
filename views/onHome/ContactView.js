@@ -10,69 +10,69 @@ const ContactView = () => {
     {
       id: 1,
       name: 'John',
-      image: require("../image_view/avtchat_01.jpg"),
+      image: require("../onHome/image_view/avtchat_01.jpg"),
       message: 'Hello, how are you?'
     },
     {
       id: 2,
       name: 'Bob',
       message: 'I am good, thank you.',
-      image: require("../image_view/avtchat_02.jpg"),
+      image: require("../onHome/image_view/avtchat_02.jpg"),
 
     },
     {
       id: 3,
       name: "Jack",
-      image: require("../image_view/avtchat_03.jpg"),
+      image: require("../onHome/image_view/avtchat_03.jpg"),
       message: 'Where are you now?'
     },
     {
       id: 4,
       name: "Conor",
-      image: require("../image_view/avtchat_04.jpg"),
+      image: require("../onHome/image_view/avtchat_04.jpg"),
       message: 'I am in the office.'
     },
     {
       id: 5,
       name: "Khabib",
-      image: require("../image_view/avtchat_05.jpg"),
+      image: require("../onHome/image_view/avtchat_05.jpg"),
       message: 'I am in the office.'
     },
     {
       id: 6,
       name: "Anable",
-      image: require("../image_view/avtchat_06.jpg"),
+      image: require("../onHome/image_view/avtchat_06.jpg"),
       message: 'I am watch tv.',
     },
     {
       id: 7,
       name: "Tony",
-      image: require("../image_view/avtchat_07.jpg"),
+      image: require("../onHome/image_view/avtchat_07.jpg"),
       message: 'I am in the office.'
     },
     {
       id: 8,
       name: "Dustin",
-      image: require("../image_view/avtchat_08.jpg"),
+      image: require("../onHome/image_view/avtchat_08.jpg"),
       message: 'I am in the office.'
     },
     {
       id: 9,
       name: "Max",
-      image: require("../image_view/avtchat_09.jpg"),
+      image: require("../onHome/image_view/avtchat_09.jpg"),
       message: 'I am in the office.'
     },
     {
       id: 10,
       name: "Jon",
-      image: require("../image_view/avtchat_10.jpg"),
+      image: require("../onHome/image_view/avtchat_10.jpg"),
       message: 'I am in the office.'
     },
 
   ]
   const [selectedTab, setSelectedTab] = useState('Bạn bè');
   const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
-  const addGroup = (props) => <MaterialIcons name="group-add" size={25}  color="#1d92fe" />;
+  const addGroup = (props) => <MaterialIcons name="group-add" size={25} color="#1d92fe" />;
 
   return (
     <ScrollView
@@ -147,7 +147,7 @@ const ContactView = () => {
                             <Text style={styles.headerText}>{item.name.charAt(0)}</Text>
                           </View>
                         ) : null}
-    
+
                         <Card.Title
                           title={item.name}
                           left={(props) => <Avatar.Image size={55} source={item.image} style={{ marginRight: 10 }} />}
@@ -169,13 +169,28 @@ const ContactView = () => {
             </View>
           ) : (
             <View>
-              <View style = {{flexDirection: "row", alignItems:"center"}}>
-              <Avatar.Icon size={70} icon={addGroup} style = {{backgroundColor:"#e9f5ff"}} />
-              <Text>Tạo nhóm mới</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Avatar.Icon size={70} icon={addGroup} style={{ backgroundColor: "#e9f5ff" }} />
+                <Text>Tạo nhóm mới</Text>
               </View>
-              <View
-
-              ></View>
+              <View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Avatar.Icon size={70} icon={addGroup} style={{ backgroundColor: "#e9f5ff" }} />
+                  <Text>Create new group</Text>
+                </View>
+                {/* <View>
+                  {sortedList.map((item, index) => (
+                    <View key={index} style={{ flexDirection: "row", flexWrap: "wrap", width: 55, height: 55 }}>
+                      {item.members && item.members.slice(0, 3).map((member, index) => (
+                        <Avatar.Image key={index} size={27.5} source={member.image} />
+                      ))}
+                      <View style={{ width: 27.5, height: 27.5, borderRadius: 13.75, backgroundColor: "#e9f5ff", justifyContent: "center", alignItems: "center" }}>
+                        <Text>{item.members ? item.members.length : 0}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View> */}
+              </View>
             </View>
 
           )}
