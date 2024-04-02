@@ -4,9 +4,22 @@ import { useNavigation } from '@react-navigation/native'
 import { AntDesign } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { setProfile } from '../../slide/ProfileSlide';
+import * as ImagePicker from "expo-image-picker"
 export default function InformationDetail() {
     let navigation = useNavigation();
     const profile = useSelector(setProfile);
+    const handleImagePickerPress = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setAvatar(result.uri);
+        }
+    };
   return (
     <View style={styles.container}>
         <View style={{flex: 1, flexDirection: "row", backgroundColor: "#247bfe"}}>

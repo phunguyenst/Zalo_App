@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import firebaseConfig from "../config"
-
+import * as ImagePicker from "expo-image-picker"
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 const screenWidth = Dimensions.get('window').width;
 const SignUp = ({ navigation }) => {
@@ -12,7 +12,41 @@ const SignUp = ({ navigation }) => {
     const [fullName, setFullName] = useState('')
     const [gender, setGender] = useState('')
     const [verificationId, setVerificationId] = useState(null);
+    const [avatar, setAvatar] = useState(null);
+
+    const handleImagePickerPress = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setAvatar(result.uri);
+        }
+    };
     const recaptchaVerifier = useRef(null);
+    // const handleChooseAvatar = () => {
+    //     const options = {
+    //         title: 'Chọn Avatar',
+    //         storageOptions: {
+    //             skipBackup: true,
+    //             path: 'images',
+    //         },
+    //     };
+
+    //     ImagePicker.showImagePicker(options, response => {
+    //         if (response.didCancel) {
+    //             console.log('User cancelled image picker');
+    //         } else if (response.error) {
+    //             console.log('ImagePicker Error: ', response.error);
+    //         } else {
+    //             const source = { uri: response.uri };
+    //             setAvatar(source);
+    //         }
+    //     });
+    // };
     const sendVerification = async () => {
         try {
             const phoneProvider = new firebaseConfig.auth.PhoneAuthProvider();
@@ -121,6 +155,13 @@ const SignUp = ({ navigation }) => {
                         <Picker.Item label="Nữ" value="female" />
                     </Picker>
                 </View>
+                <View style={{ flexDirection: "row", marginBottom: 30 }}>
+                    <TouchableOpacity onPress={handleImagePickerPress}>
+                        <Text>Choose Avatar</Text>
+                    </TouchableOpacity>
+                </View>
+                {avatar && <Image source={{ uri: avatar }} style={{ width: 200, height: 200 }} />}
+
 
                 <View style={{ marginTop: 20 }}>
                     <TouchableOpacity style={styles.button_login} onPress={handleRegister}>
