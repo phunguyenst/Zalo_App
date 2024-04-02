@@ -1,11 +1,8 @@
 import {StyleSheet, View, Text } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import BottomNavigator from '../views/BottomNavigator'
-import Login from './Login'
 
 const Home = () => {
- 
-
   return (
 
         <BottomNavigator/>
