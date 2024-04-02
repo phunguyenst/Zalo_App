@@ -1,10 +1,19 @@
 import { StyleSheet, View, Text, Image, FlatList, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import SlideShow from '../views/SlideShow'
 import { LinearGradient } from 'expo-linear-gradient'
+import { clearProfile } from '../views/slide/ProfileSlide';
+import { useDispatch, useSelector } from "react-redux"
+import { persistor } from '../views/store';
 
 
 const Welcome = ({navigation}) => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(clearProfile());
+        persistor.purge();
+    }, []);
     return (
         <View style={styles.container}>
 

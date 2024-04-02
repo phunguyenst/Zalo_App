@@ -3,12 +3,14 @@ import { createStackNavigator } from "@react-navigation/stack"
 import Welcome from './screens/Welcome';
 import Login from './screens/Login';
 import SignUp from "./screens/SignUp";
+import VerifierSignup from "./screens/VerifierSignup";
 import Home from "./screens/Home";
 import Verifier from "./screens/Verifier";
 import ChatDetail from "./views/onHome/chatView_onHome/ChatDetail";
 import infoScreen from "./views/onHome/accountView_onHome/InfomationDetai";
 import HeaderChat from "./views/onHome/chatView_onHome/HeaderChat";
 import HeaderNavigator from "./views/HeaderNavigator";
+
 import { AntDesign } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, {useState, useEffect} from 'react'
@@ -34,20 +36,20 @@ export default function App({navigation}) {
   //   };
   //   checkLoginStatus();
   // }, [])
-  const handleGetToken = async () => {
-    const authorization = await AsyncStorage.getItem('authorization');
-    console.log('token', authorization);
-    if(!authorization) {
-      navigation.replace('Login');
-    }
-    else {
-      navigation.replace('Home');
-    }
-  }
+  // const handleGetToken = async () => {
+  //   const authorization = await AsyncStorage.getItem('authorization');
+  //   console.log('token', authorization);
+  //   if(!authorization) {
+  //     navigation.replace('Login');
+  //   }
+  //   else {
+  //     navigation.replace('Home');
+  //   }
+  // }
 
-  useEffect(() => {
-    handleGetToken();
-  }, []);
+  // useEffect(() => {
+  //   handleGetToken();
+  // }, []);
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -57,6 +59,7 @@ export default function App({navigation}) {
         <Stack.Screen name="Login" component={Login} options={{ title: "Đăng nhập",  }} />
         <Stack.Screen name="Verifier" component={Verifier} options={{ title: "mã OTP",  }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ title: "Đăng ký",  }} />
+      <Stack.Screen name="VerifierSignup" component={VerifierSignup} options={{ title: "Đăng ký",  }} /> 
         <Stack.Screen name="Home" component={Home} options={
           {
             header: () => <HeaderNavigator />

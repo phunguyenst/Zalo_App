@@ -39,8 +39,8 @@ const Login = ({ navigation }) => {
   
     const handleLogin = async () => {
         try {
-            // const response = await fetch("http://localhost:5000/api/auth/sign-in-with-phone", {
-                  const response = await fetch("http://172.29.178.2:5000/api/auth/sign-in-with-phone", {
+            const response = await fetch("http://localhost:5000/api/auth/sign-in-with-phone", {
+                //   const response = await fetch("http://172.29.178.2:5000/api/auth/sign-in-with-phone", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

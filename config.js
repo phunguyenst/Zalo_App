@@ -79,13 +79,21 @@ import 'firebase/compat/firestore';
 //   messagingSenderId: "507121802964",
 //   appId: "1:507121802964:web:bb348aff742f592ff06541"
 // };
+// const firebaseConfig = {
+//   apiKey: "AIzaSyC5ZQVUB9v85XNM_P_WDWfZT8IABhQjwC4",
+//   authDomain: "phuotp3-7243b.firebaseapp.com",
+//   projectId: "phuotp3-7243b",
+//   storageBucket: "phuotp3-7243b.appspot.com",
+//   messagingSenderId: "716669947760",
+//   appId: "1:716669947760:web:60da2332bd76278e1d89b5"
+// };
 const firebaseConfig = {
-  apiKey: "AIzaSyC5ZQVUB9v85XNM_P_WDWfZT8IABhQjwC4",
-  authDomain: "phuotp3-7243b.firebaseapp.com",
-  projectId: "phuotp3-7243b",
-  storageBucket: "phuotp3-7243b.appspot.com",
-  messagingSenderId: "716669947760",
-  appId: "1:716669947760:web:60da2332bd76278e1d89b5"
+  apiKey: "AIzaSyBuHkPAMa7sh0bKzP_NwmOmlhG_qnl4kWc",
+  authDomain: "phuotp4-373e2.firebaseapp.com",
+  projectId: "phuotp4-373e2",
+  storageBucket: "phuotp4-373e2.appspot.com",
+  messagingSenderId: "474430252941",
+  appId: "1:474430252941:web:05a250bdb3b0f383c57fc4"
 };
 // Check if there are no initialized apps
 if (!firebase.apps.length) {

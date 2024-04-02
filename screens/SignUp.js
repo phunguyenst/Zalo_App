@@ -1,15 +1,29 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity,Dimensions } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import firebaseConfig from "../config"
+
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 const screenWidth = Dimensions.get('window').width;
 const SignUp = ({ navigation }) => {
     const [phone, setPhone] = useState('+84')
     const [password, setPassword] = useState('')
     const [fullName, setFullName] = useState('')
     const [gender, setGender] = useState('')
-
-    
+    const [verificationId, setVerificationId] = useState(null);
+    const recaptchaVerifier = useRef(null);
+    const sendVerification = async () => {
+        try {
+            const phoneProvider = new firebaseConfig.auth.PhoneAuthProvider();
+            const verificationId = await phoneProvider.verifyPhoneNumber(phone, recaptchaVerifier.current);
+            setVerificationId(verificationId);
+            setPhone("");
+            navigation.navigate('VerifierSignup', { verificationId: verificationId });
+        } catch (error) {
+            console.error('Error sending verification:', error);
+        }
+    };
 
     const handleRegister = async () => {
         try {
@@ -30,21 +44,15 @@ const SignUp = ({ navigation }) => {
             console.log('Status:', response.status, 'Data:', data);
 
             if (response.ok) {
-                // Handle successful login, e.g., navigate to another screen
-                navigation.navigate('Login'); // Example navigation to Home screen
-            } else {
-                // Handle login failure, e.g., display error message
 
-                // setLoginError(true);
-                // setLoginErrorMessage('Đăng nhập không thành công. Vui lòng thử lại.');
+                sendVerification();// Example navigation to Home screen
+            } else {
+
 
             }
         } catch (error) {
             console.error('Error logging in:', error);
-            // Handle error, e.g., display error message
 
-            // setLoginError(true);
-            // setLoginErrorMessage('sai mặt khẩu hoặc số điện thoại, vui lòng nhập đúng thông tin.');
 
         }
     }
@@ -115,15 +123,21 @@ const SignUp = ({ navigation }) => {
                 </View>
 
                 <View style={{ marginTop: 20 }}>
-                        <TouchableOpacity style={styles.button_login} onPress={handleRegister}>
-                            <Text style={{ color: 'white', textAlign: 'center', lineHeight: 45 }}>Đăng ký</Text>
-                        </TouchableOpacity>
-                    </View>
-
+                    <TouchableOpacity style={styles.button_login} onPress={handleRegister}>
+                        <Text style={{ color: 'white', textAlign: 'center', lineHeight: 45 }}>Đăng ký</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1, alignItems: "center" }}>
+                    <FirebaseRecaptchaVerifierModal
+                        ref={recaptchaVerifier}
+                        firebaseConfig={firebaseConfig}
+                        invisible={true}
+                    />
+                </View>
 
             </View>
-           
-          
+
+
         </View>
     )
 }
