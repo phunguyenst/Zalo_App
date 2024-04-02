@@ -87,7 +87,6 @@ const SignUp = ({ navigation }) => {
         } catch (error) {
             console.error('Error logging in:', error);
 
-
         }
     }
     return (

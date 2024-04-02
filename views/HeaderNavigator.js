@@ -29,4 +29,4 @@ const HeaderNavigator = ({ navigation }) => {
   )
 }
 
-export default HeaderNavigator
+export default HeaderNavigator;
