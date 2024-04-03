@@ -17,7 +17,9 @@ const conservationSlide = createSlice({
         },
         setConversationDetails: (state, action) =>{
             state.conversationDetails = action.payload;
-        }
+            console.log("conversationDetails", action.payload);
+           
+        },
     },
     extraReducers: (builder) => {
         // Add any extra reducers here
@@ -30,5 +32,6 @@ const conservationSlide = createSlice({
 })
 
 export const { readConversation,setConversationDetails } = conservationSlide.actions;
+export const setConversation = (state) => state.conservation.conversations;
 export default conservationSlide.reducer;
 
