@@ -1,10 +1,11 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Dimensions, Image } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import firebaseConfig from "../config"
 import * as ImagePicker from "expo-image-picker"
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
 const screenWidth = Dimensions.get('window').width;
 const SignUp = ({ navigation }) => {
     const [phone, setPhone] = useState('+84')
@@ -13,19 +14,32 @@ const SignUp = ({ navigation }) => {
     const [gender, setGender] = useState('')
     const [verificationId, setVerificationId] = useState(null);
     const [avatar, setAvatar] = useState(null);
-
+    const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+    useEffect(() => {
+        (async () => {
+            const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            setHasGalleryPermission(galleryStatus.status === 'granted');
+        })();
+    }, []);
     const handleImagePickerPress = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
-            aspect: [1, 1],
+            aspect: [4, 3],
             quality: 1,
         });
 
         if (!result.cancelled) {
             setAvatar(result.uri);
+            console.log('Image selected:', result.uri);
+        } else {
+            console.log('No image selected');
         }
     };
+    if(hasGalleryPermission === false){
+        return <Text>No access to internal storage</Text>
+    }
+
     const recaptchaVerifier = useRef(null);
     // const handleChooseAvatar = () => {
     //     const options = {
@@ -61,34 +75,38 @@ const SignUp = ({ navigation }) => {
 
     const handleRegister = async () => {
         try {
+            const formData = new FormData();
+            formData.append('phoneNumber', phone);
+            formData.append('password', password);
+            formData.append('fullName', fullName);
+            formData.append('gender', gender);
+            if (avatar) {
+                let uriParts = avatar.split('.');
+                let fileType = uriParts[uriParts.length - 1];
+                formData.append('avatar', {
+                    uri: avatar,
+                    name: `photo.${fileType}`,
+                    type: `image/${fileType}`,
+                });
+            }
+
             const response = await fetch("http://localhost:5000/api/auth/sign-up-with-phone", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    phoneNumber: phone,
-                    password: password,
-                    fullName: fullName,
-                    gender: gender
-                })
+                body: formData,
             });
 
             const data = await response.json();
             console.log('Status:', response.status, 'Data:', data);
 
             if (response.ok) {
-
-                sendVerification();// Example navigation to Home screen
+                sendVerification();
             } else {
-
-
+                // handle error
             }
         } catch (error) {
             console.error('Error logging in:', error);
-
         }
-    }
+    };
     return (
         <View style={styles.container}>
             <View style={{ flex: 5, margin: 10 }}>
@@ -154,12 +172,13 @@ const SignUp = ({ navigation }) => {
                         <Picker.Item label="Nữ" value="female" />
                     </Picker>
                 </View>
-                <View style={{ flexDirection: "row", marginBottom: 30 }}>
-                    <TouchableOpacity onPress={handleImagePickerPress}>
-                        <Text>Choose Avatar</Text>
+                <View style={{ flexDirection: "row", alignItems: 'center', marginBottom: 30 }}>
+                    <TouchableOpacity style={styles.avatarButton} onPress={handleImagePickerPress}>
+                        <Text style={{ color: 'white' }}>Choose Avatar</Text>
                     </TouchableOpacity>
+                    {avatar && <Image source={{ uri: avatar }} style={{ flex: 1/2 }} />}
                 </View>
-                {avatar && <Image source={{ uri: avatar }} style={{ width: 200, height: 200 }} />}
+
 
 
                 <View style={{ marginTop: 20 }}>
@@ -194,13 +213,10 @@ const styles = StyleSheet.create({
         height: 45,
         borderRadius: 10,
         width: screenWidth - 40,
-    }
-    // button_arrow: {
-    //     backgroundColor: '#06b2fc',
-    //     borderRadius: "70%",
-    //     height: 50,
-    //     width: 50,
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    // },
+    },
+    avatarButton: {
+        backgroundColor: '#06b2fc',
+        padding: 10,
+        borderRadius: 5,
+    },
 })

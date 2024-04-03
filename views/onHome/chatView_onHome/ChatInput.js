@@ -15,12 +15,44 @@ import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { selectAuthorization } from "../../slide/LoginSlide";
+import { useDispatch, useSelector } from "react-redux"
+import { addMessage, readMessage } from '../../slide/MessageSlide';
+import axios from 'axios';
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const ChatInput = () => {
     const [message, setMessage] = useState('');
+    const dispatch = useDispatch();
+    const conversationDetails = useSelector(state => state.conservation.conversationDetails);
+    const conversationId = conversationDetails ? conversationDetails.conversationId : null;
+    console.log("conversationId In message" + conversationId);
+    const authorization = useSelector(selectAuthorization);
 
+    const sendMessage = async () => {
+        try {
+            const response = await axios.post(
+                'http://localhost:5000/api/message/',
+                {
+                    content: message,
+                    conversationId: conversationId
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${authorization}`
+                    }
+                }
+            );
+            console.log(response.data);
+            dispatch(addMessage(response.data.messages)); 
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    };
+
+ 
    
+    
         // const ImagePicker = () => {
         //     let options = {
         //         storageOptions: {
@@ -58,7 +90,7 @@ const ChatInput = () => {
                         multiline
                         placeholder="Type a message"
                         style = {styles.input}
-                        onChangeText={text => setTe}
+                        onChangeText={text => setMessage(text)}
                     ></TextInput>
                 <TouchableOpacity
                 style = {styles.rightIconButtonStyle}
@@ -71,7 +103,9 @@ const ChatInput = () => {
                    <Feather name="image" size={24} color="black" />
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style = {styles.sendButton}>
+            <TouchableOpacity style = {styles.sendButton}
+                onPress={sendMessage}
+            >
             <MaterialCommunityIcons  name={message ? "send": "microphone"} size={24} color="black" />
             </TouchableOpacity>
        </View>
@@ -85,6 +119,8 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: "center",
         backgroundColor: "white",
+        position: "absolute",
+        bottom: 0,
         
         
     },

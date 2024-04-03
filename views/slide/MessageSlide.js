@@ -17,11 +17,15 @@ const MessageSlide = createSlice({
         },
         setMessageDetails: (state, action) => {
             state.messageDetails = action.payload;
+        },
+        addMessage: (state, action) => {
+            state.messages.push(action.payload);
+
         }
     },
 
 });
 
-export const { readMessage, setMessageDetails } = MessageSlide.actions;
+export const { readMessage, setMessageDetails, addMessage } = MessageSlide.actions;
 export const setMessages = (state) => state.message.messages;
 export default MessageSlide.reducer;

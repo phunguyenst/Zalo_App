@@ -39,7 +39,7 @@ export default function InformationDetail() {
         <Image style={{width: 60, height: 60,borderRadius: 50, resizeMode: "contain"}} source={{uri: profile.profilePic}}></Image>
         </View>
            
-        <Text style={{position: "absolute",top: "70%",fontFamily: "Roboto", fontSize: 20, fontWeight: "bold", color: "white", paddingLeft: "25%" }}>{profile.fullName}</Text>
+        <Text style={{position: "absolute",top: "70%",fontFamily: "Roboto", fontSize: 20, fontWeight: "bold", color: "black", paddingLeft: "25%" }}>{profile.fullName}</Text>
         </View>
         <View style={{flex:3, backgroundColor: "#fff"}}>
             <Text style={{fontFamily: "Roboto", fontSize: 18, fontWeight: "bold", paddingLeft: "5%", paddingTop: "3%"}}>Thông tin cá nhân</Text>
