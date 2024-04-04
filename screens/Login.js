@@ -53,7 +53,6 @@ const Login = ({ navigation }) => {
 			const response = await fetch(
 				'http://localhost:5000/api/auth/sign-in-with-phone',
 				{
-					//   const response = await fetch("http://172.29.178.2:5000/api/auth/sign-in-with-phone", {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -88,74 +87,12 @@ const Login = ({ navigation }) => {
 			navigation.navigate('Home');
 		} catch (error) {
 			console.error('Error logging in:', error);
-			// Handle error, e.g., display error message
-
 			setLoginError(true);
 			setLoginErrorMessage(
 				'sai mặt khẩu hoặc số điện thoại, vui lòng nhập đúng thông tin.'
 			);
 		}
 	};
-	//     return (
-
-	//         <View style={styles.container}>
-	//             <View style={{ height: 300 }}>
-
-	//                 <View style={{ height: 80, margin: 0, padding: 0, width: "100%", backgroundColor: 'f3f4f6' }}>
-	//                     <Text>Vui lòng nhập số điện thoại và mật khẩu để đăng nhập</Text>
-	//                 </View>
-	//                 <View style={{ height: 250, margin: 10 }}>
-	//                     <View style={{ flexDirection: "row", marginBottom: 30 }}>
-	//                         <TextInput
-	//                             placeholder='nhập số điện thoại'
-	//                             style={{ height: 40, width: 350, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white', borderWidth: 0, borderBottomWidth: 1, borderBottomColor: "#eeeeee", paddingBottom: 10 }}
-	//                             value={phone}
-	//                             onChangeText={text => {
-	//                                 setPhone(text)
-	//                             }}
-	//                         ></TextInput>
-	//                         <AntDesign name="close" size={24} color="black"
-	//                             style={{ position: 'absolute', right: 25, top: 10 }}
-	//                         />
-	//                     </View>
-	//                     <View style={{ flexDirection: "row", marginBottom: 30 }}>
-	//                         <TextInput
-	//                             placeholder='nhập mật khẩu'
-	//                             style={{ height: 40, width: 350, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white', borderWidth: 0, borderBottomWidth: 1, borderBottomColor: "#eeeeee", paddingBottom: 10 }}
-	//                             onChangeText={text => {
-	//                                 setPassword(text)
-	//                             }}
-	//                         ></TextInput>
-	//                         <AntDesign name="eye" size={24} color="black"
-	//                             style={{ position: 'absolute', right: 25, top: 10 }}
-	//                         />
-	//                     </View>
-	//                     {loginError && <Text style={{ color: 'red' }}>{loginErrorMessage}</Text>}
-	//                     <View style={{ marginTop: 20 }}>
-	//                         <TouchableOpacity style={styles.button_login} onPress={handleLogin}>
-	//                             <Text style={{ color: 'white', textAlign: 'center', lineHeight: 45 }}>Đăng nhập</Text>
-	//                         </TouchableOpacity>
-	//                     </View>
-	//                 </View>
-	//             </View>
-	//             <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', marginBottom: 10 }}>
-	//                 <Text style={{ fontSize: 16, color: "#000" }}>
-	//                     Bạn chưa là thành viên?
-	//                     <TouchableOpacity onPress={() => { navigation.navigate('SignUp'); }}>
-	//                         <Text style={{ color: "#438ff6", fontSize: 16 }}> Hãy đăng ký!</Text>
-	//                     </TouchableOpacity>
-	//                 </Text>
-	//             </View>
-	//             <View style={{flex: 1, alignItems: "center"}}>
-	//                 <FirebaseRecaptchaVerifierModal
-	//                     ref={recaptchaVerifier}
-	//                     firebaseConfig={firebaseConfig}
-	//                     invisible={true}
-	//                 />
-	//             </View>
-	//         </View>
-	//     )
-	// }
 
 	const handlerSentSMS = async () => {
 		sendChangePasswordRequest(newPassword, phoneForget);
@@ -194,37 +131,35 @@ const Login = ({ navigation }) => {
 
 	return (
 		<PaperProvider>
-			<View style={styles.container}>
-				<View style={{ height: 300 }}>
+			<View style={{ flex: 1, padding: 15 }}>
+				<View>
 					<View
 						style={{
 							height: 80,
-							margin: 0,
-							padding: 0,
 							width: '100%',
-							backgroundColor: 'f3f4f6',
+							backgroundColor: '#f3f4f6',
 						}}
 					>
-						<Text>
+						<Text style={{ textAlign: 'center' }}>
 							Vui lòng nhập số điện thoại và mật khẩu để đăng nhập
 						</Text>
 					</View>
-					<View style={{ height: 250, margin: 10 }}>
+					<View style={{ height: 250 }}>
 						<View
-							style={{ flexDirection: 'row', marginBottom: 30 }}
+							style={{
+								flexDirection: 'row',
+								marginBottom: 30,
+								alignItems: 'center',
+							}}
 						>
 							<TextInput
 								placeholder="nhập số điện thoại"
 								style={{
 									height: 40,
-									width: 350,
-									borderColor: 'gray',
-									borderWidth: 1,
+									width: '100%',
 									backgroundColor: 'white',
-									borderWidth: 0,
-									borderBottomWidth: 1,
-									borderBottomColor: '#eeeeee',
-									paddingBottom: 10,
+									borderRadius: 5,
+									paddingHorizontal: 20,
 								}}
 								value={phone}
 								onChangeText={(text) => {
@@ -233,42 +168,44 @@ const Login = ({ navigation }) => {
 							></TextInput>
 							<AntDesign
 								name="close"
-								size={24}
+								size={20}
 								color="black"
 								style={{
 									position: 'absolute',
-									right: 25,
+									right: 20,
 									top: 10,
 								}}
 							/>
 						</View>
 						<View
-							style={{ flexDirection: 'row', marginBottom: 30 }}
+							style={{
+								flexDirection: 'row',
+								marginBottom: 30,
+								alignItems: 'center',
+							}}
 						>
 							<TextInput
 								placeholder="nhập mật khẩu"
 								style={{
 									height: 40,
-									width: 350,
-									borderColor: 'gray',
-									borderWidth: 1,
+									width: '100%',
 									backgroundColor: 'white',
-									borderWidth: 0,
-									borderBottomWidth: 1,
-									borderBottomColor: '#eeeeee',
-									paddingBottom: 10,
+									borderRadius: 5,
+									paddingHorizontal: 20,
 								}}
+								secureTextEntry={true}
+								value={password}
 								onChangeText={(text) => {
 									setPassword(text);
 								}}
 							></TextInput>
 							<AntDesign
 								name="eye"
-								size={24}
+								size={20}
 								color="black"
 								style={{
 									position: 'absolute',
-									right: 25,
+									right: 20,
 									top: 10,
 								}}
 							/>
@@ -278,16 +215,20 @@ const Login = ({ navigation }) => {
 								{loginErrorMessage}
 							</Text>
 						)}
-						<View style={{ marginTop: 20 }}>
-							<TouchableOpacity
-								style={styles.button_login}
-								onPress={handleLogin}
-							>
+						<View
+							style={{
+								marginTop: 20,
+								backgroundColor: '#06b2fc',
+								height: 40,
+								borderRadius: 10,
+							}}
+						>
+							<TouchableOpacity onPress={handleLogin}>
 								<Text
 									style={{
 										color: 'white',
 										textAlign: 'center',
-										lineHeight: 45,
+										lineHeight: 40,
 									}}
 								>
 									Đăng nhập
@@ -390,16 +331,3 @@ const Login = ({ navigation }) => {
 	);
 };
 export default Login;
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'space-between',
-	},
-	button_login: {
-		backgroundColor: '#06b2fc',
-		height: 45,
-		borderRadius: 10,
-		width: screenWidth - 40,
-	},
-});

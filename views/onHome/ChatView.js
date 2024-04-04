@@ -15,16 +15,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { readConversation } from "../slide/ConsevationSlide";
+import { readConversation, setConversationDetails } from "../slide/ConsevationSlide";
 import { useDispatch, useSelector } from "react-redux"
 import { selectAuthorization } from "../slide/LoginSlide";
-import { setConversationDetails } from "../slide/ConsevationSlide";
+
 
 import axios from 'axios';
 const ChatView = ({ navigation, route }) => {
   
   const dispatch = useDispatch();
-  const currentConversation = useSelector((state) => state.conversations);
+ 
   const [listmess, setList] = useState([])
   const authorization = useSelector(selectAuthorization);
  console.log("authorization" + authorization);
@@ -42,7 +42,7 @@ const ChatView = ({ navigation, route }) => {
         const formattedData = data.conversations.map(conversation => {
           const conversationId = conversation.conversationId;
           const participantIds = conversation.participantIds;
-          dispatch(setConversationDetails({ conversationId, participantIds }));
+          dispatch(readConversation({ conversationId, participantIds }));
           return conversation.membersInfo.map(member => {
             // const userID = data.conversations[0].userID;
             // dispatch(setConversationDetails(userID));
@@ -56,7 +56,7 @@ const ChatView = ({ navigation, route }) => {
         }).flat();
         
         
-        dispatch(readConversation(formattedData));
+        dispatch(setConversationDetails(formattedData));
         setList(formattedData);
       } else {
         // Xử lý lỗi khi fetch không thành công

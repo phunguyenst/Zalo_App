@@ -29,14 +29,12 @@ export default function InformationDetail() {
 		});
 
 		if (!result.cancelled) {
-			console.log(result.assets);
 			uploadProfilePic(result?.assets[0]);
 		}
 	};
 
 	const uploadProfilePic = async (file) => {
 		let formData = new FormData();
-		console.log(file);
 		formData.append('profilePic', file);
 
 		for (let [key, value] of formData.entries()) {
