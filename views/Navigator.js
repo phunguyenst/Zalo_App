@@ -1,4 +1,3 @@
-// Navigator.js
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -18,7 +17,9 @@ import ChatDetail from './onHome/chatView_onHome/ChatDetail';
 import infoScreen from './onHome/accountView_onHome/InfomationDetai';
 import HeaderChat from './onHome/chatView_onHome/HeaderChat';
 import HeaderNavigator from './HeaderNavigator';
+import Search from '../screens/Search';
 import { setAuthorization, setIsLogin } from './slide/LoginSlide';
+import HeaderBack from './HeaderBack';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +92,13 @@ const Navigator = () => {
 						name="infoScreen"
 						component={infoScreen}
 						options={{ headerShown: false }}
+					/>
+					<Stack.Screen
+						name="Search"
+						component={Search}
+						options={{
+							header: () => <HeaderBack />,
+						}}
 					/>
 				</Stack.Navigator>
 			</PersistGate>
