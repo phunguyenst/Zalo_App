@@ -13,17 +13,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import firebaseConfig from '../config';
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
 
-import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
-	const [phone, setPhone] = useState('+84334127445');
+	const [phone, setPhone] = useState('+84812580727');
 	const [password, setPassword] = useState('12345678');
 	const [loginError, setLoginError] = useState(false);
 	const [loginErrorMessage, setLoginErrorMessage] = useState('');
-
 	const [verificationId, setVerificationId] = useState(null);
 	const dispatch = useDispatch();
 
@@ -266,14 +263,6 @@ const Login = ({ navigation }) => {
 						</TouchableOpacity>
 					</Text>
 				</View>
-				<View style={{ flex: 1, alignItems: 'center' }}>
-					<FirebaseRecaptchaVerifierModal
-						ref={recaptchaVerifier}
-						firebaseConfig={firebaseConfig}
-						invisible={true}
-					/>
-				</View>
-
 				<Portal>
 					<Dialog
 						visible={showModalForgetPassword}

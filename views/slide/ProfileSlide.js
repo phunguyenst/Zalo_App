@@ -21,4 +21,5 @@ const ProfileSlide = createSlice({
 
 export const { readProfile, clearProfile } = ProfileSlide.actions;
 export const setProfile = (state) => state.profile.profile;
+export const selectUserId = (state) => state.profile.profile?.userID;
 export default ProfileSlide.reducer;
