@@ -1,81 +1,101 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useState, useEffect, useRef } from 'react'
+import {
+	StyleSheet,
+	View,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	Dimensions,
+} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import { AntDesign } from '@expo/vector-icons';
-import { setAuthorization, setIsLogin } from "../views/slide/LoginSlide";
-import { useDispatch, useSelector } from "react-redux"
-import firebaseConfig from "../config"
+import { setAuthorization, setIsLogin } from '../views/slide/LoginSlide';
+import { useDispatch, useSelector } from 'react-redux';
+import firebaseConfig from '../config';
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
-
-
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
-    
-    const [phone, setPhone] = useState('+84812580727')
-    const [password, setPassword] = useState('12345678')
-    const [loginError, setLoginError] = useState(false);
-    const [loginErrorMessage, setLoginErrorMessage] = useState('');
-    const dispatch = useDispatch()
+	const [phone, setPhone] = useState('+84812580727');
+	const [password, setPassword] = useState('12345678');
+	const [loginError, setLoginError] = useState(false);
+	const [loginErrorMessage, setLoginErrorMessage] = useState('');
+	const [verificationId, setVerificationId] = useState(null);
+	const dispatch = useDispatch();
 
-	const [showModalForgetPassword, setShowModalForgetPassword] = useState(false);
+	const [showModalForgetPassword, setShowModalForgetPassword] =
+		useState(false);
 	const [phoneForget, setPhoneForget] = useState('');
 	const [newPassword, setNewPassword] = useState('');
+	//ref cho recaptcha
+	const recaptchaVerifier = useRef(null);
+	const sendVerification = async () => {
+		try {
+			const phoneProvider = new firebaseConfig.auth.PhoneAuthProvider();
+			const verificationId = await phoneProvider.verifyPhoneNumber(
+				phone,
+				recaptchaVerifier.current
+			);
+			setVerificationId(verificationId);
+			setPhone('');
+			navigation.navigate('Verifier', { verificationId: verificationId });
+		} catch (error) {
+			console.error('Error sending verification:', error);
+		}
+	};
 
+	const handleLogin = async () => {
+		try {
+			const response = await fetch(
+				'http://localhost:5000/api/auth/sign-in-with-phone',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						phoneNumber: phone,
+						password: password,
+					}),
+				}
+			);
 
-  
-    const handleLogin = async () => {
-        try {
-            const response = await fetch("http://localhost:5000/api/auth/sign-in-with-phone", {
-                //   const response = await fetch("http://172.29.178.2:5000/api/auth/sign-in-with-phone", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    phoneNumber: phone,
-                    password: password
-                })
-            });
+			const data = await response.json();
+			console.log('Status:', response.status, 'Data:', data);
 
-            const data = await response.json();
-            console.log('Status:', response.status, 'Data:', data);
+			if (response.ok) {
+				// Handle successful login, e.g., navigate to another screen
+				const authorization = response.headers.get('Authorization');
+				console.log('authorization' + authorization);
+				dispatch(setAuthorization(authorization));
+				await AsyncStorage.setItem('authorization', authorization);
+				dispatch(setIsLogin(true));
+				// Set Authorization as a param for Home screen
+			} else {
+				// Handle login failure, e.g., display error message
 
-            if (response.ok) {
-                // Handle successful login, e.g., navigate to another screen
-                const authorization = response.headers.get('Authorization');
-                console.log("authorization"+ authorization);
-                dispatch(setAuthorization(authorization));
-                await AsyncStorage.setItem('authorization', authorization);
-                dispatch(setIsLogin(true));
-				navigation.navigate('Home');
-                // Set Authorization as a param for Home screen
-              
-            } else {
-                // Handle login failure, e.g., display error message
+				setLoginError(true);
+				setLoginErrorMessage(
+					'Đăng nhập không thành công. Vui lòng thử lại.'
+				);
+			}
+			// sendVerification();
+			navigation.navigate('Home');
+		} catch (error) {
+			console.error('Error logging in:', error);
+			setLoginError(true);
+			setLoginErrorMessage(
+				'sai mặt khẩu hoặc số điện thoại, vui lòng nhập đúng thông tin.'
+			);
+		}
+	};
 
-                setLoginError(true);
-                setLoginErrorMessage('Đăng nhập không thành công. Vui lòng thử lại.');
-
-            }
-        } catch (error) {
-            console.error('Error logging in:', error);
-            // Handle error, e.g., display error message
-
-            setLoginError(true);
-            setLoginErrorMessage('sai mặt khẩu hoặc số điện thoại, vui lòng nhập đúng thông tin.');
-
-        }
-    }			
 	const handlerSentSMS = async () => {
 		sendChangePasswordRequest(newPassword, phoneForget);
 	};
 
 	const showDialog = () => {
-		console.log('click');
 		setShowModalForgetPassword(true);
 	};
 	const hideDialog = () => setShowModalForgetPassword(false);
@@ -108,37 +128,35 @@ const Login = ({ navigation }) => {
 
 	return (
 		<PaperProvider>
-			<View style={styles.container}>
-				<View style={{ height: 300 }}>
+			<View style={{ flex: 1, padding: 15 }}>
+				<View>
 					<View
 						style={{
 							height: 80,
-							margin: 0,
-							padding: 0,
 							width: '100%',
-							backgroundColor: 'f3f4f6',
+							backgroundColor: '#f3f4f6',
 						}}
 					>
-						<Text>
+						<Text style={{ textAlign: 'center' }}>
 							Vui lòng nhập số điện thoại và mật khẩu để đăng nhập
 						</Text>
 					</View>
-					<View style={{ height: 250, margin: 10 }}>
+					<View style={{ height: 250 }}>
 						<View
-							style={{ flexDirection: 'row', marginBottom: 30 }}
+							style={{
+								flexDirection: 'row',
+								marginBottom: 30,
+								alignItems: 'center',
+							}}
 						>
 							<TextInput
 								placeholder="nhập số điện thoại"
 								style={{
 									height: 40,
-									width: 350,
-									borderColor: 'gray',
-									borderWidth: 1,
+									width: '100%',
 									backgroundColor: 'white',
-									borderWidth: 0,
-									borderBottomWidth: 1,
-									borderBottomColor: '#eeeeee',
-									paddingBottom: 10,
+									borderRadius: 5,
+									paddingHorizontal: 20,
 								}}
 								value={phone}
 								onChangeText={(text) => {
@@ -147,42 +165,44 @@ const Login = ({ navigation }) => {
 							></TextInput>
 							<AntDesign
 								name="close"
-								size={24}
+								size={20}
 								color="black"
 								style={{
 									position: 'absolute',
-									right: 25,
+									right: 20,
 									top: 10,
 								}}
 							/>
 						</View>
 						<View
-							style={{ flexDirection: 'row', marginBottom: 30 }}
+							style={{
+								flexDirection: 'row',
+								marginBottom: 30,
+								alignItems: 'center',
+							}}
 						>
 							<TextInput
 								placeholder="nhập mật khẩu"
 								style={{
 									height: 40,
-									width: 350,
-									borderColor: 'gray',
-									borderWidth: 1,
+									width: '100%',
 									backgroundColor: 'white',
-									borderWidth: 0,
-									borderBottomWidth: 1,
-									borderBottomColor: '#eeeeee',
-									paddingBottom: 10,
+									borderRadius: 5,
+									paddingHorizontal: 20,
 								}}
+								secureTextEntry={true}
+								value={password}
 								onChangeText={(text) => {
 									setPassword(text);
 								}}
 							></TextInput>
 							<AntDesign
 								name="eye"
-								size={24}
+								size={20}
 								color="black"
 								style={{
 									position: 'absolute',
-									right: 25,
+									right: 20,
 									top: 10,
 								}}
 							/>
@@ -192,16 +212,20 @@ const Login = ({ navigation }) => {
 								{loginErrorMessage}
 							</Text>
 						)}
-						<View style={{ marginTop: 20 }}>
-							<TouchableOpacity
-								style={styles.button_login}
-								onPress={handleLogin}
-							>
+						<View
+							style={{
+								marginTop: 20,
+								backgroundColor: '#06b2fc',
+								height: 40,
+								borderRadius: 10,
+							}}
+						>
+							<TouchableOpacity onPress={handleLogin}>
 								<Text
 									style={{
 										color: 'white',
 										textAlign: 'center',
-										lineHeight: 45,
+										lineHeight: 40,
 									}}
 								>
 									Đăng nhập
@@ -294,18 +318,5 @@ const Login = ({ navigation }) => {
 			</View>
 		</PaperProvider>
 	);
-}
+};
 export default Login;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "space-between"
-    },
-    button_login: {
-        backgroundColor: '#06b2fc',
-        height: 45,
-        borderRadius: 10,
-        width: screenWidth - 40,
-    }
-})

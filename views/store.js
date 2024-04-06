@@ -1,33 +1,33 @@
-import {combineReducers, configureStore } from "@reduxjs/toolkit";
-import conservationReducer from "../views/slide/ConsevationSlide";
-import loginReducer from "../views/slide/LoginSlide";
-import messageReducer from "../views/slide/MessageSlide";
-import profilerReducer from "../views/slide/ProfileSlide"
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import conservationReducer from '../views/slide/ConsevationSlide';
+import loginReducer from '../views/slide/LoginSlide';
+import messageReducer from '../views/slide/MessageSlide';
+import profilerReducer from '../views/slide/ProfileSlide';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistStore, persistReducer } from 'redux-persist';
+
 const rootReducer = combineReducers({
-    // user: userReducer,
-    conservation: conservationReducer,
-   
-    message: messageReducer,
-    profile: profilerReducer,
-    auth: loginReducer,
-    
-})
+	conservation: conservationReducer,
+
+	message: messageReducer,
+	profile: profilerReducer,
+	auth: loginReducer,
+});
 
 const presistConfig = {
-    key: 'root',
-    storage: AsyncStorage,
-    whitelist: ['auth', 'isLogin'],
-    blacklist: ['register'],
-}
+	key: 'root',
+	storage: AsyncStorage,
+	whitelist: ['auth', 'isLogin'],
+	blacklist: ['register'],
+};
 const persistedReducer = persistReducer(presistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-        serializableCheck: false,
-    }),
+	reducer: persistedReducer,
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({
+			serializableCheck: false,
+		}),
 });
 
 export const persistor = persistStore(store);
