@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux"
 import firebaseConfig from "../config"
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
 
-import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,26 +19,13 @@ const Login = ({ navigation }) => {
     const [password, setPassword] = useState('12345678')
     const [loginError, setLoginError] = useState(false);
     const [loginErrorMessage, setLoginErrorMessage] = useState('');
-  
-    const [verificationId, setVerificationId] = useState(null);
     const dispatch = useDispatch()
 
 	const [showModalForgetPassword, setShowModalForgetPassword] = useState(false);
 	const [phoneForget, setPhoneForget] = useState('');
 	const [newPassword, setNewPassword] = useState('');
-    //ref cho recaptcha
-    const recaptchaVerifier = useRef(null);
-    const sendVerification = async () => {
-        try {
-            const phoneProvider = new firebaseConfig.auth.PhoneAuthProvider();
-            const verificationId = await phoneProvider.verifyPhoneNumber(phone, recaptchaVerifier.current);
-            setVerificationId(verificationId);
-            setPhone("");
-            navigation.navigate('Verifier', { verificationId: verificationId });
-        } catch (error) {
-            console.error('Error sending verification:', error);
-        }
-    };
+
+
   
     const handleLogin = async () => {
         try {
@@ -65,6 +51,7 @@ const Login = ({ navigation }) => {
                 dispatch(setAuthorization(authorization));
                 await AsyncStorage.setItem('authorization', authorization);
                 dispatch(setIsLogin(true));
+				navigation.navigate('Home');
                 // Set Authorization as a param for Home screen
               
             } else {
@@ -74,7 +61,6 @@ const Login = ({ navigation }) => {
                 setLoginErrorMessage('Đăng nhập không thành công. Vui lòng thử lại.');
 
             }
-            sendVerification();
         } catch (error) {
             console.error('Error logging in:', error);
             // Handle error, e.g., display error message
@@ -83,69 +69,7 @@ const Login = ({ navigation }) => {
             setLoginErrorMessage('sai mặt khẩu hoặc số điện thoại, vui lòng nhập đúng thông tin.');
 
         }
-    }
-//     return (
-
-//         <View style={styles.container}>
-//             <View style={{ height: 300 }}>
-       
-//                 <View style={{ height: 80, margin: 0, padding: 0, width: "100%", backgroundColor: 'f3f4f6' }}>
-//                     <Text>Vui lòng nhập số điện thoại và mật khẩu để đăng nhập</Text>
-//                 </View>
-//                 <View style={{ height: 250, margin: 10 }}>
-//                     <View style={{ flexDirection: "row", marginBottom: 30 }}>
-//                         <TextInput
-//                             placeholder='nhập số điện thoại'
-//                             style={{ height: 40, width: 350, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white', borderWidth: 0, borderBottomWidth: 1, borderBottomColor: "#eeeeee", paddingBottom: 10 }}
-//                             value={phone}
-//                             onChangeText={text => {
-//                                 setPhone(text)
-//                             }}
-//                         ></TextInput>
-//                         <AntDesign name="close" size={24} color="black"
-//                             style={{ position: 'absolute', right: 25, top: 10 }}
-//                         />
-//                     </View>
-//                     <View style={{ flexDirection: "row", marginBottom: 30 }}>
-//                         <TextInput
-//                             placeholder='nhập mật khẩu'
-//                             style={{ height: 40, width: 350, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white', borderWidth: 0, borderBottomWidth: 1, borderBottomColor: "#eeeeee", paddingBottom: 10 }}
-//                             onChangeText={text => {
-//                                 setPassword(text)
-//                             }}
-//                         ></TextInput>
-//                         <AntDesign name="eye" size={24} color="black"
-//                             style={{ position: 'absolute', right: 25, top: 10 }}
-//                         />
-//                     </View>
-//                     {loginError && <Text style={{ color: 'red' }}>{loginErrorMessage}</Text>}
-//                     <View style={{ marginTop: 20 }}>
-//                         <TouchableOpacity style={styles.button_login} onPress={handleLogin}>
-//                             <Text style={{ color: 'white', textAlign: 'center', lineHeight: 45 }}>Đăng nhập</Text>
-//                         </TouchableOpacity>
-//                     </View>
-//                 </View>
-//             </View>
-//             <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', marginBottom: 10 }}>
-//                 <Text style={{ fontSize: 16, color: "#000" }}>
-//                     Bạn chưa là thành viên?
-//                     <TouchableOpacity onPress={() => { navigation.navigate('SignUp'); }}>
-//                         <Text style={{ color: "#438ff6", fontSize: 16 }}> Hãy đăng ký!</Text>
-//                     </TouchableOpacity>
-//                 </Text>
-//             </View>
-//             <View style={{flex: 1, alignItems: "center"}}>
-//                 <FirebaseRecaptchaVerifierModal
-//                     ref={recaptchaVerifier}
-//                     firebaseConfig={firebaseConfig}
-//                     invisible={true}
-//                 />
-//             </View>
-//         </View>
-//     )
-// }
-
-			
+    }			
 	const handlerSentSMS = async () => {
 		sendChangePasswordRequest(newPassword, phoneForget);
 	};
@@ -315,14 +239,6 @@ const Login = ({ navigation }) => {
 						</TouchableOpacity>
 					</Text>
 				</View>
-				<View style={{ flex: 1, alignItems: 'center' }}>
-					<FirebaseRecaptchaVerifierModal
-						ref={recaptchaVerifier}
-						firebaseConfig={firebaseConfig}
-						invisible={true}
-					/>
-				</View>
-
 				<Portal>
 					<Dialog
 						visible={showModalForgetPassword}
