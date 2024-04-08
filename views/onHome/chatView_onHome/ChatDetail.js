@@ -1,40 +1,58 @@
-import {
-    StyleSheet,
-    View,
-    Text,
-    TextInput,
-    FlatList,
-    ScrollView,
-    TouchableOpacity,
-} from "react-native";
-import React from "react";
-import { Feather } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { View, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setMessages } from '../../slide/MessageSlide';
+import HeaderChat from '../chatView_onHome/HeaderChat';
+import ChatInput from '../chatView_onHome/ChatInput';
+import MessageScreen from '../chatView_onHome/MessagesList';
+import messageApi from '../../../api/messageApi';
 
-import ChatView from "../ChatView";
+const ChatDetail = ({ navigation }) => {
+	const conversationDetails = useSelector(
+		(state) => state.conservation?.conversationDetails
+	);
+	const profile = useSelector((state) => state.profile.profile);
+	const dispatch = useDispatch();
 
-import HeaderChat from "../chatView_onHome/HeaderChat";
-import ChatInput from "../chatView_onHome/ChatInput";
-import MessageScreen from "../chatView_onHome/MessagesList";
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const res = await messageApi.getMessages(
+					conversationDetails?.conversationId
+				);
+				if (res && res.messages) {
+					const updatedMessages = res.messages.map((message) => ({
+						...message,
+						isMyMessage: message.senderId === profile.userID,
+					}));
+					dispatch(setMessages(updatedMessages));
+				}
+			} catch (error) {
+				console.error('Error fetching messages:', error);
+			}
+		};
 
+		fetchData();
+	}, [conversationDetails?.conversationId, profile.userID, dispatch]);
 
-const ChatDetail = ({navigation}) => {
-    return (
-        <View style ={styles.container}>
-           <HeaderChat navigation={navigation}/>
-           <MessageScreen />
-           <ChatInput />
-        </View>
-    )
-}
+	return (
+		<View style={styles.container}>
+			<HeaderChat navigation={navigation} />
+			<View style={styles.messageScreenContainer}>
+				<MessageScreen />
+			</View>
+			<ChatInput />
+		</View>
+	);
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        position: 'relative',
-    },
+	container: {
+		flex: 1,
+	},
+	messageScreenContainer: {
+		flex: 1,
+	},
 });
-export default ChatDetail
+
+export default ChatDetail;
