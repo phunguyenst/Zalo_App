@@ -1,6 +1,6 @@
-import { View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
-import { Text } from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
+import EmojiSelector from 'react-native-emoji-selector';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import messageApi from '../../../api/messageApi';
@@ -8,6 +8,7 @@ import { addMessage } from '../../slide/MessageSlide';
 
 const ChatInput = () => {
 	const [message, setMessage] = useState('');
+	const [showEmojiSelector, setShowEmojiSelector] = useState(false); // State để kiểm soát hiển thị EmojiSelector
 	const dispatch = useDispatch();
 	const conversationDetails = useSelector(
 		(state) => state.conservation.conversationDetails
@@ -17,19 +18,21 @@ const ChatInput = () => {
 	const sendMessage = async () => {
 		try {
 			// Gửi tin nhắn đến API
-			const response = await messageApi.sendMessage({
+			const res = await messageApi.sendMessage({
 				conversationId: conversationDetails.conversationId,
 				content: message,
 				type: 'text',
 			});
 
-			dispatch(
-				addMessage({
-					content: message,
-					senderId: profile.userID,
-					isMyMessage: true,
-				})
-			);
+			if (res) {
+				dispatch(
+					addMessage({
+						content: message,
+						senderId: profile.userID,
+						isMyMessage: true,
+					})
+				);
+			}
 
 			// Xóa nội dung tin nhắn khỏi trường nhập
 			setMessage('');
@@ -39,12 +42,7 @@ const ChatInput = () => {
 	};
 
 	return (
-		<View
-			style={{
-				justifyContent: 'center',
-				backgroundColor: 'white',
-			}}
-		>
+		<View style={{ justifyContent: 'center', backgroundColor: 'white' }}>
 			<View
 				style={{
 					flexDirection: 'row',
@@ -64,7 +62,9 @@ const ChatInput = () => {
 						paddingHorizontal: 15,
 					}}
 				>
-					<TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => setShowEmojiSelector(!showEmojiSelector)}
+					>
 						<MaterialCommunityIcons
 							name="emoticon-outline"
 							size={24}
@@ -84,7 +84,7 @@ const ChatInput = () => {
 						}}
 						value={message}
 						onChangeText={(text) => setMessage(text)}
-					></TextInput>
+					/>
 					<TouchableOpacity>
 						<Feather name="paperclip" size={20} color="black" />
 					</TouchableOpacity>
@@ -110,6 +110,13 @@ const ChatInput = () => {
 					/>
 				</TouchableOpacity>
 			</View>
+			{/* Hiển thị EmojiSelector nếu showEmojiSelector là true */}
+			{showEmojiSelector && (
+				<EmojiSelector
+					onEmojiSelected={(emoji) => setMessage(message + emoji)}
+					showSearchBar={false} // Tùy chỉnh các thuộc tính khác theo nhu cầu của bạn
+				/>
+			)}
 		</View>
 	);
 };
