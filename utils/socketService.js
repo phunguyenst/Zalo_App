@@ -1,19 +1,29 @@
-import { io } from 'socket.io-client';
-const socket = io.connect('http://localhost:3000');
+import io from 'socket.io-client';
 
-socket.on('connect', () => {
-	console.log('Connected to server');
-});
+const socketService = {
+	socket: null,
 
-socket.on('disconnect', () => {
-	console.log('Disconnected from server');
-});
+	initialize(userId) {
+		this.socket = io('http://localhost:5000', { query: { userId } });
+	},
 
-socket.on('chat message', (msg) => {
-	console.log('New message:', msg);
-});
+	onMessage(event, callback) {
+		if (this.socket) {
+			this.socket.on(event, callback);
+		}
+	},
 
-const sendMessage = (msg) => {
-	socket.emit('chat message', msg);
+	sendMessage(event, data) {
+		if (this.socket) {
+			this.socket.emit(event, data);
+		}
+	},
+
+	disconnect() {
+		if (this.socket) {
+			this.socket.disconnect();
+		}
+	},
 };
-export default socket;
+
+export default socketService;

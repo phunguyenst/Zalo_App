@@ -1,13 +1,15 @@
 import { View, StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setMessages } from '../../slide/MessageSlide';
+import { addMessage, setMessages } from '../../slide/MessageSlide';
 import HeaderChat from '../chatView_onHome/HeaderChat';
 import ChatInput from '../chatView_onHome/ChatInput';
 import MessageScreen from '../chatView_onHome/MessagesList';
 import messageApi from '../../../api/messageApi';
+import { useSocket } from '../../socketContext';
 
 const ChatDetail = ({ navigation }) => {
+	const socket = useSocket();
 	const conversationDetails = useSelector(
 		(state) => state.conservation?.conversationDetails
 	);
@@ -34,6 +36,24 @@ const ChatDetail = ({ navigation }) => {
 
 		fetchData();
 	}, [conversationDetails?.conversationId, profile.userID, dispatch]);
+
+	useEffect(() => {
+		if (socket) {
+			const handleNewMessage = (newMessage) => {
+				const updatedMessage = {
+					...newMessage,
+					isMyMessage: newMessage.senderId === profile.userID,
+				};
+				dispatch(addMessage(updatedMessage)); // Giả sử bạn có action addMessage
+			};
+
+			socket.on('newMessage', handleNewMessage);
+
+			return () => {
+				socket.off('newMessage', handleNewMessage);
+			};
+		}
+	}, [socket, dispatch, profile.userID]);
 
 	return (
 		<View style={styles.container}>

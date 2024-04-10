@@ -11,32 +11,13 @@ import * as ImagePicker from 'expo-image-picker';
 const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [imageUri, setImageUri] = useState(null);
+	const [showEmojiSelector, setShowEmojiSelector] = useState(false);
 	const dispatch = useDispatch();
 	const conversationDetails = useSelector(
 		(state) => state.conservation.conversationDetails
 	);
 	const profile = useSelector((state) => state.profile.profile);
 
-	// const pickFile = async () => {
-	//     try {
-	//         const res = await DocumentPicker.pick({
-	//             type: [DocumentPicker.types.allFiles],
-	//         });
-
-	//         console.log(
-	//             res.uri,
-	//             res.type,
-	//             res.name,
-	//             res.size
-	//         );
-	//     } catch (err) {
-	//         if (DocumentPicker.isCancel(err)) {
-
-	//         } else {
-	//             throw err;
-	//         }
-	//     }
-	// };
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -45,16 +26,17 @@ const ChatInput = () => {
 			quality: 1,
 			base64: true,
 		});
-
-		if (!result.cancelled) {
+		if (!result.canceled) {
+			console.log('result 48: ', result);
 			setMessage('');
-			setImageUri(result.uri);
+			setImageUri(result.assets[0].uri);
 		}
 	};
 
 	const sendMessage = async (content, type) => {
 		try {
 			let data = new FormData();
+
 			if (type === 'image') {
 				let base64 = await getBase64Image(imageUri);
 				let filename = 'image.jpg';
@@ -71,45 +53,39 @@ const ChatInput = () => {
 					content: imageUri,
 					type: 'image',
 				});
-				dispatch(
-					addMessage({
-						content: imageUri,
-						senderId: profile.userID,
-						isMyMessage: true,
-					})
-				);
-				console.log('type' + type);
-				// setImageUri(null);
+				if (response) {
+					dispatch(
+						addMessage({
+							content: imageUri,
+							senderId: profile.userID,
+							isMyMessage: true,
+							type: 'image',
+						})
+					);
+					setImageUri('');
+				}
 			}
 
 			if (type === 'text') {
-				console.log('type' + type);
-				console.log('message' + message);
 				const response = await messageApi.sendMessage({
 					conversationId: conversationDetails.conversationId,
 					content: message,
 					type: 'text',
 				});
 
-				dispatch(
-					addMessage({
-						content: message,
-						senderId: profile.userID,
-						isMyMessage: true,
-					})
-				);
-				// setMessage('');
+				if (response) {
+					dispatch(
+						addMessage({
+							content: message,
+							senderId: profile.userID,
+							isMyMessage: true,
+						})
+					);
+					setMessage('');
+				}
 			}
 		} catch (error) {
-			if (error.response) {
-				console.error('Error status:', error.response.status);
-				console.error('Error data:', error.response.data);
-			} else if (error.request) {
-				console.error('No response received:', error.request);
-			} else {
-				console.error('Error', error.message);
-			}
-			console.error('Error config:', error.config);
+			console.error('Error when sent message: ', error);
 		}
 	};
 
@@ -130,7 +106,7 @@ const ChatInput = () => {
 			xhr.send(null);
 		});
 	};
-
+	console.log('image uri: ', imageUri);
 	return (
 		<View
 			style={{
@@ -158,7 +134,9 @@ const ChatInput = () => {
 						paddingHorizontal: 15,
 					}}
 				>
-					<TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => setShowEmojiSelector(!showEmojiSelector)}
+					>
 						<MaterialCommunityIcons
 							name="emoticon-outline"
 							size={24}
@@ -189,7 +167,7 @@ const ChatInput = () => {
 								width: 200,
 							}}
 						>
-							<Text> chọn ảnh</Text>
+							{/* <Text> chọn ảnh</Text> */}
 							<Image
 								source={{ uri: imageUri }}
 								style={{
@@ -199,9 +177,7 @@ const ChatInput = () => {
 							/>
 						</View>
 					)}
-					<TouchableOpacity
-					//  onPress={pickFile}
-					>
+					<TouchableOpacity>
 						<Feather name="paperclip" size={20} color="black" />
 					</TouchableOpacity>
 					<TouchableOpacity onPress={pickImage}>
@@ -232,6 +208,12 @@ const ChatInput = () => {
 					/>
 				</TouchableOpacity>
 			</View>
+			{showEmojiSelector && (
+				<EmojiSelector
+					onEmojiSelected={(emoji) => setMessage(message + emoji)}
+					showSearchBar={false} // Tùy chỉnh các thuộc tính khác theo nhu cầu của bạn
+				/>
+			)}
 		</View>
 	);
 };

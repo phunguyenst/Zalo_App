@@ -15,7 +15,6 @@ import { setConversationDetails } from '../slide/ConsevationSlide';
 const ChatView = ({ navigation, route }) => {
 	const dispatch = useDispatch();
 	const profile = useSelector((state) => state.profile.profile);
-  console.log("profile", profile);
 	const [listConversation, setListConversation] = useState([]);
 	useEffect(() => {
 		const fetchConversations = async () => {
