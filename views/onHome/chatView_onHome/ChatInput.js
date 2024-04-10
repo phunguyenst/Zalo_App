@@ -1,30 +1,96 @@
+import { View, TextInput, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity } from 'react-native';
 import EmojiSelector from 'react-native-emoji-selector';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import messageApi from '../../../api/messageApi';
 import { addMessage } from '../../slide/MessageSlide';
+import * as ImagePicker from 'expo-image-picker';
+// import * as DocumentPicker from 'react-native-document-picker';
 
 const ChatInput = () => {
 	const [message, setMessage] = useState('');
-	const [showEmojiSelector, setShowEmojiSelector] = useState(false); // State để kiểm soát hiển thị EmojiSelector
+	const [imageUri, setImageUri] = useState(null);
 	const dispatch = useDispatch();
 	const conversationDetails = useSelector(
 		(state) => state.conservation.conversationDetails
 	);
 	const profile = useSelector((state) => state.profile.profile);
 
-	const sendMessage = async () => {
-		try {
-			// Gửi tin nhắn đến API
-			const res = await messageApi.sendMessage({
-				conversationId: conversationDetails.conversationId,
-				content: message,
-				type: 'text',
-			});
+	// const pickFile = async () => {
+	//     try {
+	//         const res = await DocumentPicker.pick({
+	//             type: [DocumentPicker.types.allFiles],
+	//         });
 
-			if (res) {
+	//         console.log(
+	//             res.uri,
+	//             res.type,
+	//             res.name,
+	//             res.size
+	//         );
+	//     } catch (err) {
+	//         if (DocumentPicker.isCancel(err)) {
+
+	//         } else {
+	//             throw err;
+	//         }
+	//     }
+	// };
+	const pickImage = async () => {
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.All,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+			base64: true,
+		});
+
+		if (!result.cancelled) {
+			setMessage('');
+			setImageUri(result.uri);
+		}
+	};
+
+	const sendMessage = async (content, type) => {
+		try {
+			let data = new FormData();
+			if (type === 'image') {
+				let base64 = await getBase64Image(imageUri);
+				let filename = 'image.jpg';
+				let imageType = 'image/jpg';
+				data.append('content', filename);
+				data.append('file', {
+					uri: imageUri,
+					name: filename,
+					type: imageType,
+				});
+
+				const response = await messageApi.sendMessage({
+					conversationId: conversationDetails.conversationId,
+					content: imageUri,
+					type: 'image',
+				});
+				dispatch(
+					addMessage({
+						content: imageUri,
+						senderId: profile.userID,
+						isMyMessage: true,
+					})
+				);
+				console.log('type' + type);
+				// setImageUri(null);
+			}
+
+			if (type === 'text') {
+				console.log('type' + type);
+				console.log('message' + message);
+				const response = await messageApi.sendMessage({
+					conversationId: conversationDetails.conversationId,
+					content: message,
+					type: 'text',
+				});
+
 				dispatch(
 					addMessage({
 						content: message,
@@ -32,23 +98,53 @@ const ChatInput = () => {
 						isMyMessage: true,
 					})
 				);
+				// setMessage('');
 			}
-
-			// Xóa nội dung tin nhắn khỏi trường nhập
-			setMessage('');
 		} catch (error) {
-			console.error('Error sending message:', error);
+			if (error.response) {
+				console.error('Error status:', error.response.status);
+				console.error('Error data:', error.response.data);
+			} else if (error.request) {
+				console.error('No response received:', error.request);
+			} else {
+				console.error('Error', error.message);
+			}
+			console.error('Error config:', error.config);
 		}
 	};
 
+	const getBase64Image = async (imageUri) => {
+		return new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.onload = function () {
+				let reader = new FileReader();
+				reader.onloadend = function () {
+					resolve(reader.result.split(',')[1]);
+				};
+				reader.onerror = reject;
+				reader.readAsDataURL(xhr.response);
+			};
+			xhr.onerror = reject;
+			xhr.responseType = 'blob';
+			xhr.open('GET', imageUri, true);
+			xhr.send(null);
+		});
+	};
+
 	return (
-		<View style={{ justifyContent: 'center', backgroundColor: 'white' }}>
+		<View
+			style={{
+				justifyContent: 'center',
+				backgroundColor: 'white',
+			}}
+		>
 			<View
 				style={{
 					flexDirection: 'row',
 					alignItems: 'center',
 					justifyContent: 'center',
 					padding: 10,
+					position: 'relative',
 				}}
 			>
 				<View
@@ -62,9 +158,7 @@ const ChatInput = () => {
 						paddingHorizontal: 15,
 					}}
 				>
-					<TouchableOpacity
-						onPress={() => setShowEmojiSelector(!showEmojiSelector)}
-					>
+					<TouchableOpacity>
 						<MaterialCommunityIcons
 							name="emoticon-outline"
 							size={24}
@@ -85,10 +179,32 @@ const ChatInput = () => {
 						value={message}
 						onChangeText={(text) => setMessage(text)}
 					/>
-					<TouchableOpacity>
+					{imageUri && (
+						<View
+							style={{
+								position: 'absolute',
+								bottom: 120,
+								left: 10,
+								height: 100,
+								width: 200,
+							}}
+						>
+							<Text> chọn ảnh</Text>
+							<Image
+								source={{ uri: imageUri }}
+								style={{
+									width: 200,
+									height: 100,
+								}}
+							/>
+						</View>
+					)}
+					<TouchableOpacity
+					//  onPress={pickFile}
+					>
 						<Feather name="paperclip" size={20} color="black" />
 					</TouchableOpacity>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={pickImage}>
 						<Feather name="image" size={20} color="black" />
 					</TouchableOpacity>
 				</View>
@@ -101,7 +217,13 @@ const ChatInput = () => {
 						justifyContent: 'center',
 						backgroundColor: '#139afc',
 					}}
-					onPress={sendMessage}
+					onPress={() => {
+						if (imageUri) {
+							sendMessage(imageUri, 'image');
+						} else if (message.trim() !== '') {
+							sendMessage(message, 'text');
+						}
+					}}
 				>
 					<MaterialCommunityIcons
 						name={'send'}
@@ -110,13 +232,6 @@ const ChatInput = () => {
 					/>
 				</TouchableOpacity>
 			</View>
-			{/* Hiển thị EmojiSelector nếu showEmojiSelector là true */}
-			{showEmojiSelector && (
-				<EmojiSelector
-					onEmojiSelected={(emoji) => setMessage(message + emoji)}
-					showSearchBar={false} // Tùy chỉnh các thuộc tính khác theo nhu cầu của bạn
-				/>
-			)}
 		</View>
 	);
 };
