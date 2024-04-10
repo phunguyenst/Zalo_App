@@ -15,7 +15,6 @@ import { setConversationDetails } from '../slide/ConsevationSlide';
 const ChatView = ({ navigation, route }) => {
 	const dispatch = useDispatch();
 	const profile = useSelector((state) => state.profile.profile);
-  console.log("profile", profile);
 	const [listConversation, setListConversation] = useState([]);
 	useEffect(() => {
 		const fetchConversations = async () => {
@@ -71,7 +70,10 @@ const ChatView = ({ navigation, route }) => {
 																profile?.userID
 														)?.fullName
 													}
-													subtitle={item.lastMessage}
+													subtitle={
+														item.lastMessage ||
+														'Chưa có tin nhắn nào'
+													}
 													titleStyle={{
 														fontSize: 18,
 													}}
