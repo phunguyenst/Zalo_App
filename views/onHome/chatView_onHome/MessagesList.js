@@ -8,10 +8,12 @@ const MessagesList = () => {
 	const dispatch = useDispatch();
 	const messages = useSelector((state) => state.message.messages);
 
+	//đồng bộ tin nhắn
 	useEffect(() => {
 		dispatch(readMessage(messages));
 	}, [dispatch, messages]);
 
+	//đếm số tin nhắn cần hiển thị
 	const handleScroll = (event) => {
 		const { layoutMeasurement, contentOffset, contentSize } =
 			event.nativeEvent;
@@ -21,11 +23,11 @@ const MessagesList = () => {
 			setNumMessagesToShow((prevNum) => prevNum + 6);
 		}
 	};
-
+	//scroll xuống cuối khi có tin nhắn mới
 	const handleContentSizeChange = (contentWidth, contentHeight) => {
 		scrollViewRef.current.scrollToEnd({ animated: true });
 	};
-
+	//scroll xuống cuối khi có tin nhắn mới
 	useEffect(() => {
 		scrollViewRef.current.scrollToEnd({ animated: true });
 	}, [messages]);

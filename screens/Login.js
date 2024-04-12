@@ -48,7 +48,7 @@ const Login = ({ navigation }) => {
 	const handleLogin = async () => {
 		try {
 			const response = await fetch(
-				'http://localhost:5000/api/auth/sign-in-with-phone',
+				'localhost:5000/api/auth/sign-in-with-phone',
 				{
 					method: 'POST',
 					headers: {
@@ -103,7 +103,7 @@ const Login = ({ navigation }) => {
 	const sendChangePasswordRequest = async (newPassword, phoneN) => {
 		try {
 			const res = await fetch(
-				'http://localhost:5000/api/user/change-password',
+				'localhost:5000/api/user/change-password',
 				{
 					method: 'PUT',
 					headers: {

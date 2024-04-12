@@ -1,7 +1,17 @@
 import {StyleSheet, View, Text } from 'react-native'
 import React from 'react'
 import { ScrollView } from 'react-native-web'
-const Message = ({time, isLeft, message}) => {
+import { AntDesign } from '@expo/vector-icons';
+import messageApi from '../../../api/messageApi';
+const Message = ({time, isLeft, message, messageId}) => {
+    const handleDelete = async () => {
+        try {
+            const response = await messageApi.deleteMessageForMeOnly(messageId)
+            console.log(response) // handle the response as needed
+        } catch (error) {
+            console.error(error) // handle the error as needed
+        }
+    }
     const isOnLeft = type =>{
         if(isLeft ==true && type === "messageContainer"){
             return {
@@ -41,6 +51,11 @@ const Message = ({time, isLeft, message}) => {
         >
             <Text style ={[styles.time, isOnLeft("time")]}>{time}</Text>
         </View>
+        <TouchableOpacity onPress={handleDelete}>
+        <AntDesign name="delete" size={24} color="red" 
+            
+        />
+                </TouchableOpacity>
       </View>
     </View>
   )

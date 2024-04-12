@@ -31,7 +31,7 @@ const AccountView = () => {
 		});
 	};
 	useEffect(() => {
-		fetch('http://localhost:5000/api/auth/secret', {
+		fetch('localhost:5000/api/auth/secret', {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${authorization}`,
