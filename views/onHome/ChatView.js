@@ -29,7 +29,6 @@ const ChatView = ({ navigation, route }) => {
 		fetchConversations();
 	}, []);
 
-	console.log('List converstation: ', listConversation);
 	return (
 		<View style={{ flex: 1, backgroundColor: 'white' }}>
 			<ScrollView nestedScrollEnabled>
