@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addMessage, setMessages } from '../../slide/MessageSlide';
 import HeaderChat from '../chatView_onHome/HeaderChat';
 import ChatInput from '../chatView_onHome/ChatInput';
-import MessageScreen from '../chatView_onHome/MessagesList';
+import MessagesList from '../chatView_onHome/MessagesList';
 import messageApi from '../../../api/messageApi';
 import { useSocket } from '../../socketContext';
 
@@ -15,8 +15,6 @@ const ChatDetail = ({ navigation }) => {
 	);
 	const profile = useSelector((state) => state.profile.profile);
 	const dispatch = useDispatch();
-	console.log('conversation detail: ', conversationDetails);
-	console.log('conversation detail: ', profile);
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -60,7 +58,7 @@ const ChatDetail = ({ navigation }) => {
 		<View style={styles.container}>
 			<HeaderChat navigation={navigation} />
 			<View style={styles.messageScreenContainer}>
-				<MessageScreen />
+				<MessagesList />
 			</View>
 			<ChatInput />
 		</View>

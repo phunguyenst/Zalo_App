@@ -27,7 +27,6 @@ const ChatInput = () => {
 			base64: true,
 		});
 		if (!result.canceled) {
-			console.log('result 48: ', result);
 			setMessage('');
 			setImageUri(result.assets[0].uri);
 		}
@@ -72,12 +71,10 @@ const ChatInput = () => {
 					content: message,
 					type: 'text',
 				});
-
-				if (response) {
+				if (response.message) {
 					dispatch(
 						addMessage({
-							content: message,
-							senderId: profile.userID,
+							...response.message[0],
 							isMyMessage: true,
 						})
 					);
@@ -106,7 +103,7 @@ const ChatInput = () => {
 			xhr.send(null);
 		});
 	};
-	console.log('image uri: ', imageUri);
+
 	return (
 		<View
 			style={{

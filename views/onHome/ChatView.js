@@ -52,7 +52,7 @@ const ChatView = ({ navigation, route }) => {
 											}}
 										>
 											<Avatar.Image
-												size={55}
+												size={40}
 												source={{
 													uri:
 														item.participantIds
@@ -77,7 +77,7 @@ const ChatView = ({ navigation, route }) => {
 																	(member) =>
 																		member.userID !==
 																		profile?.userID
-															  )?.name
+															  )?.fullName
 													}
 													subtitle={
 														item.lastMessage
@@ -85,10 +85,7 @@ const ChatView = ({ navigation, route }) => {
 														'Chưa có tin nhắn nào'
 													}
 													titleStyle={{
-														fontSize: 18,
-													}}
-													subtitleStyle={{
-														fontSize: 15,
+														fontSize: 16,
 													}}
 												/>
 											</View>
