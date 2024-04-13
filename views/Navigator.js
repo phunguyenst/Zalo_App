@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -18,14 +18,19 @@ import infoScreen from './onHome/accountView_onHome/InfomationDetai';
 import HeaderChat from './onHome/chatView_onHome/HeaderChat';
 import HeaderNavigator from './HeaderNavigator';
 import Search from '../screens/Search';
+import createGroup from '../views/onHome/group_onHome/CreateNewGroup';
 import { setAuthorization, setIsLogin } from './slide/LoginSlide';
 import HeaderBack from './HeaderBack';
+import socketService from '../utils/socketService';
+import { SocketProvider } from './socketContext';
 
 const Stack = createStackNavigator();
 
 const Navigator = () => {
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
+	const profile = useSelector((state) => state.profile.profile);
+
 	useEffect(() => {
 		const checkToken = async () => {
 			try {
@@ -44,65 +49,83 @@ const Navigator = () => {
 		checkToken();
 	}, []);
 
+	useEffect(() => {
+		if (profile) {
+			socketService.initialize(profile.userID);
+			return () => {
+				socketService.disconnect();
+			};
+		}
+	}, [dispatch, navigation]);
+
 	return (
-		<View style={{ flex: 1 }}>
-			<PersistGate loading={null} persistor={persistor}>
-				<Stack.Navigator>
-					<Stack.Screen
-						name="Login"
-						component={Login}
-						options={{ title: 'Đăng nhập' }}
-					/>
-					<Stack.Screen
-						name="Welcome"
-						component={Welcome}
-						options={{ headerShown: false }}
-					/>
-					<Stack.Screen
-						name="Verifier"
-						component={Verifier}
-						options={{ title: 'mã OTP' }}
-					/>
-					<Stack.Screen
-						name="SignUp"
-						component={SignUp}
-						options={{ title: 'Đăng ký' }}
-					/>
-					<Stack.Screen
-						name="VerifierSignup"
-						component={VerifierSignup}
-						options={{ title: 'Đăng ký' }}
-					/>
-					<Stack.Screen
-						name="Home"
-						component={Home}
-						options={{
-							header: () => <HeaderNavigator />,
-						}}
-					/>
-					<Stack.Screen
-						name="ChatDetail"
-						component={ChatDetail}
-						options={{
-							header: () => <HeaderChat />,
-							headerShown: false,
-						}}
-					/>
-					<Stack.Screen
-						name="infoScreen"
-						component={infoScreen}
-						options={{ headerShown: false }}
-					/>
-					<Stack.Screen
-						name="Search"
-						component={Search}
-						options={{
-							header: () => <HeaderBack />,
-						}}
-					/>
-				</Stack.Navigator>
-			</PersistGate>
-		</View>
+		<SocketProvider>
+			<View style={{ flex: 1 }}>
+				<PersistGate loading={null} persistor={persistor}>
+					<Stack.Navigator>
+						<Stack.Screen
+							name="Login"
+							component={Login}
+							options={{ title: 'Đăng nhập' }}
+						/>
+						<Stack.Screen
+							name="Welcome"
+							component={Welcome}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Verifier"
+							component={Verifier}
+							options={{ title: 'mã OTP' }}
+						/>
+						<Stack.Screen
+							name="SignUp"
+							component={SignUp}
+							options={{ title: 'Đăng ký' }}
+						/>
+						<Stack.Screen
+							name="VerifierSignup"
+							component={VerifierSignup}
+							options={{ title: 'Đăng ký' }}
+						/>
+						<Stack.Screen
+							name="Home"
+							component={Home}
+							options={{
+								header: () => <HeaderNavigator />,
+							}}
+						/>
+						<Stack.Screen
+							name="ChatDetail"
+							component={ChatDetail}
+							options={{
+								header: () => <HeaderChat />,
+								headerShown: false,
+							}}
+						/>
+						<Stack.Screen
+							name="infoScreen"
+							component={infoScreen}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Search"
+							component={Search}
+							options={{
+								header: () => <HeaderBack />,
+							}}
+						/>
+						{/* <Stack.Screen
+							name="createGroup"
+							component={createGroup}
+							options={{
+								headerShown: true,
+							}}
+						/> */}
+					</Stack.Navigator>
+				</PersistGate>
+			</View>
+		</SocketProvider>
 	);
 };
 

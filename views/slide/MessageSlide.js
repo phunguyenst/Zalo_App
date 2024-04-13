@@ -13,6 +13,7 @@ const MessageSlide = createSlice({
 	reducers: {
 		readMessage: (state, action) => {
 			state.messages = action.payload;
+			console.log('messages: ', action.payload);
 		},
 		setMessageDetails: (state, action) => {
 			state.messageDetails = action.payload;
