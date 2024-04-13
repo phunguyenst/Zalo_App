@@ -42,7 +42,7 @@ export default function InformationDetail() {
 		}
 		try {
 			const response = await fetch(
-				'http://localhost:5000/api/user/update-profile-pic',
+				'localhost:5000/api/user/update-profile-pic',
 				{
 					method: 'PATCH',
 					headers: {

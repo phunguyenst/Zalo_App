@@ -18,6 +18,7 @@ import infoScreen from './onHome/accountView_onHome/InfomationDetai';
 import HeaderChat from './onHome/chatView_onHome/HeaderChat';
 import HeaderNavigator from './HeaderNavigator';
 import Search from '../screens/Search';
+import createGroup from '../views/onHome/group_onHome/CreateNewGroup';
 import { setAuthorization, setIsLogin } from './slide/LoginSlide';
 import HeaderBack from './HeaderBack';
 import socketService from '../utils/socketService';
@@ -114,6 +115,13 @@ const Navigator = () => {
 								header: () => <HeaderBack />,
 							}}
 						/>
+						{/* <Stack.Screen
+							name="createGroup"
+							component={createGroup}
+							options={{
+								headerShown: true,
+							}}
+						/> */}
 					</Stack.Navigator>
 				</PersistGate>
 			</View>

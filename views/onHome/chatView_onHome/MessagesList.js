@@ -8,6 +8,7 @@ const MessagesList = () => {
 	const dispatch = useDispatch();
 	const messages = useSelector((state) => state.message.messages);
 
+	//đồng bộ tin nhắn
 	useEffect(() => {
 		dispatch(readMessage(messages));
 	}, [dispatch, messages]);

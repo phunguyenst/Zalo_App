@@ -30,22 +30,22 @@ const AccountView = () => {
 			navigation.navigate('Welcome');
 		});
 	};
-	useEffect(() => {
-		fetch('http://localhost:5000/api/auth/secret', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${authorization}`,
-			},
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				setUserData(data.user);
-				dispatch(readProfile(data.user));
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
-	}, []);
+	// useEffect(() => {
+	// 	fetch('localhost:5000/api/auth/secret', {
+	// 		method: 'GET',
+	// 		headers: {
+	// 			Authorization: `Bearer ${authorization}`,
+	// 		},
+	// 	})
+	// 		.then((response) => response.json())
+	// 		.then((data) => {
+	// 			setUserData(data.user);
+	// 			dispatch(readProfile(data.user));
+	// 		})
+	// 		.catch((error) => {
+	// 			console.error('Error:', error);
+	// 		});
+	// }, []);
 
 	return (
 		<View style={styles.container}>

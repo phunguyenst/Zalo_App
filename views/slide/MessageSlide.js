@@ -13,6 +13,7 @@ const MessageSlide = createSlice({
 	reducers: {
 		readMessage: (state, action) => {
 			state.messages = action.payload;
+			console.log('messages: ', action.payload);
 		},
 		setMessageDetails: (state, action) => {
 			state.messageDetails = action.payload;
@@ -20,13 +21,18 @@ const MessageSlide = createSlice({
 		addMessage: (state, action) => {
 			state.messages.push(action.payload);
 		},
+		deleteMessage: (state, action) => {
+			state.messages = state.messages.filter(
+				(message) => message.id !== action.payload
+			);
+		},
 		setMessages: (state, action) => {
 			state.messages = action.payload;
 		},
 	},
 });
 
-export const { readMessage, setMessageDetails, addMessage, setMessages } =
+export const { readMessage, setMessageDetails, addMessage, setMessages, deleteMessage } =
 	MessageSlide.actions;
 export const selectMessages = (state) => state.message.messages;
 export default MessageSlide.reducer;

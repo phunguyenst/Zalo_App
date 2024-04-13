@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-const ContactView = () => {
+const ContactView = ({ navigation }) => {
   const list = [
     {
       id: 1,
@@ -169,10 +169,13 @@ const ContactView = () => {
             </View>
           ) : (
             <View>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center" }}
+                onPress={() => navigation.navigate('createGroup')}
+              >
                 <Avatar.Icon size={70} icon={addGroup} style={{ backgroundColor: "#e9f5ff" }} />
                 <Text>Tạo nhóm mới</Text>
-              </View>
+              </TouchableOpacity>
               <View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Avatar.Icon size={70} icon={addGroup} style={{ backgroundColor: "#e9f5ff" }} />
