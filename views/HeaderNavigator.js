@@ -12,6 +12,11 @@ const HeaderNavigator = () => {
 		navigation.navigate('Search');
 	};
 
+	const handleCreateGroup = () => {
+		console.log('create group');
+		navigation.navigate('CreateGroup');
+	};
+
 	return (
 		<LinearGradient
 			colors={['#247bfe', '#139afc', '#02b9fa']}
@@ -27,7 +32,13 @@ const HeaderNavigator = () => {
 				<TouchableOpacity onPress={handleSearch}>
 					<AntDesign name="search1" size={20} color="white" />
 				</TouchableOpacity>
-				<View style={{ flex: 1 }}>
+				<View
+					style={{
+						flex: 1,
+						backgroundColor: 'red',
+						marginHorizontal: 20,
+					}}
+				>
 					<TouchableOpacity onPress={handleSearch}>
 						<TextInput
 							placeholder="Tìm kiếm"
@@ -36,7 +47,6 @@ const HeaderNavigator = () => {
 								paddingHorizontal: 10,
 								height: 40,
 								borderWidth: 0,
-								width: '100%',
 								color: 'white',
 								outlineWidth: 0,
 							}}
@@ -46,8 +56,8 @@ const HeaderNavigator = () => {
 						/>
 					</TouchableOpacity>
 				</View>
-				<TouchableOpacity onPress={handleSearch}>
-					<AntDesign name="plus" size={20} color="white" />
+				<TouchableOpacity onPress={handleCreateGroup}>
+					<AntDesign name="addusergroup" size={20} color="white" />
 				</TouchableOpacity>
 			</View>
 		</LinearGradient>

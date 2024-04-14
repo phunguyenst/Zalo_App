@@ -1,15 +1,24 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { Button, Menu, Divider, PaperProvider } from 'react-native-paper';
-import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 
-const Message = ({ message }) => {
-	const [visible, setVisible] = useState(false);
+import React from 'react';
 
-	const openMenu = () => setVisible(true);
-
-	const closeMenu = () => setVisible(false);
+const Message = ({ message, onPress }) => {
 	return (
-		<PaperProvider>
+		<View
+			style={{
+				flex: 1,
+				flexDirection: message.isMyMessage ? 'row' : 'row-reverse',
+				alignItems: 'center',
+				justifyContent: 'flex-end',
+			}}
+		>
+			{!message.isRecalled && (
+				<TouchableOpacity onPress={() => onPress(message)}>
+					<Entypo name="dots-three-vertical" size={20} color="gray" />
+				</TouchableOpacity>
+			)}
+
 			<View
 				style={[
 					styles.messageContainer,
@@ -18,7 +27,16 @@ const Message = ({ message }) => {
 						: styles.otherMessage,
 				]}
 			>
-				{message.type === 'image' ? (
+				{message.isRecalled ? (
+					<Text
+						style={{
+							fontSize: 16,
+							color: 'gray',
+						}}
+					>
+						Tin nhắn đã bị thu hồi
+					</Text>
+				) : message.type === 'image' ? (
 					<Image
 						source={{ uri: message.content }}
 						style={{ width: 200, height: 200 }}
@@ -34,7 +52,7 @@ const Message = ({ message }) => {
 					</Text>
 				)}
 			</View>
-		</PaperProvider>
+		</View>
 	);
 };
 
@@ -50,11 +68,10 @@ const styles = StyleSheet.create({
 	},
 	myMessage: {
 		alignSelf: 'flex-end',
-		backgroundColor: '#139afc',
+		backgroundColor: '#0091ff',
 		color: 'white',
 	},
 	otherMessage: {
-		alignSelf: 'flex-start',
 		backgroundColor: 'lightgray',
 		color: 'black',
 	},

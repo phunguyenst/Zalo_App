@@ -14,6 +14,7 @@ import firebaseConfig from '../config';
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import authApi from '../api/authApi';
 
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
@@ -47,34 +48,18 @@ const Login = ({ navigation }) => {
 
 	const handleLogin = async () => {
 		try {
-			const response = await fetch(
-				'localhost:5000/api/auth/sign-in-with-phone',
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						phoneNumber: phone,
-						password: password,
-					}),
-				}
-			);
+			const response = await authApi.signInWithPhone({
+				phoneNumber: phone,
+				password: password,
+			});
 
-			const data = await response.json();
-			console.log('Status:', response.status, 'Data:', data);
-
-			if (response.ok) {
+			if (response.status === 200) {
 				// Handle successful login, e.g., navigate to another screen
 				const authorization = response.headers.get('Authorization');
-				console.log('authorization' + authorization);
 				dispatch(setAuthorization(authorization));
 				await AsyncStorage.setItem('authorization', authorization);
 				dispatch(setIsLogin(true));
-				// Set Authorization as a param for Home screen
 			} else {
-				// Handle login failure, e.g., display error message
-
 				setLoginError(true);
 				setLoginErrorMessage(
 					'Đăng nhập không thành công. Vui lòng thử lại.'
@@ -102,19 +87,16 @@ const Login = ({ navigation }) => {
 
 	const sendChangePasswordRequest = async (newPassword, phoneN) => {
 		try {
-			const res = await fetch(
-				'localhost:5000/api/user/change-password',
-				{
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						newPassword: newPassword,
-						phoneNumber: phoneN,
-					}),
-				}
-			);
+			const res = await fetch('localhost:5000/api/user/change-password', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					newPassword: newPassword,
+					phoneNumber: phoneN,
+				}),
+			});
 			// Đóng modal
 			if (res.status === 200) alert('Cập nhật mật khẩu thành công');
 			else alert('Cập nhật mật khẩu thất bại');

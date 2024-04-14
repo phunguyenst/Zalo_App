@@ -28,6 +28,7 @@ const ChatView = ({ navigation, route }) => {
 
 		fetchConversations();
 	}, []);
+
 	return (
 		<View style={{ flex: 1, backgroundColor: 'white' }}>
 			<ScrollView nestedScrollEnabled>
@@ -51,34 +52,40 @@ const ChatView = ({ navigation, route }) => {
 											}}
 										>
 											<Avatar.Image
-												size={55}
+												size={40}
 												source={{
-													uri: item?.membersInfo?.find(
-														(member) =>
-															member.userID !==
-															profile?.userID
-													)?.profilePic,
+													uri:
+														item.participantIds
+															.length > 2
+															? item?.avatar
+															: item?.membersInfo?.find(
+																	(member) =>
+																		member.userID !==
+																		profile?.userID
+															  )?.profilePic,
 												}}
 												style={{ marginRight: 10 }}
 											/>
+
 											<View style={{ flex: 1 }}>
 												<Card.Title
 													title={
-														item?.membersInfo?.find(
-															(member) =>
-																member.userID !==
-																profile?.userID
-														)?.fullName
+														item.participantIds
+															.length > 2
+															? item?.name
+															: item?.membersInfo?.find(
+																	(member) =>
+																		member.userID !==
+																		profile?.userID
+															  )?.fullName
 													}
 													subtitle={
-														item.lastMessage ||
+														item.lastMessage
+															?.content ||
 														'Chưa có tin nhắn nào'
 													}
 													titleStyle={{
-														fontSize: 18,
-													}}
-													subtitleStyle={{
-														fontSize: 15,
+														fontSize: 16,
 													}}
 												/>
 											</View>

@@ -16,6 +16,7 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 import { selectAuthorization } from '../slide/LoginSlide';
 
 import { persistor } from '../store';
+import authApi from '../../api/authApi';
 const AccountView = () => {
 	let navigation = useNavigation();
 	const dispatch = useDispatch();
@@ -30,22 +31,19 @@ const AccountView = () => {
 			navigation.navigate('Welcome');
 		});
 	};
-	// useEffect(() => {
-	// 	fetch('localhost:5000/api/auth/secret', {
-	// 		method: 'GET',
-	// 		headers: {
-	// 			Authorization: `Bearer ${authorization}`,
-	// 		},
-	// 	})
-	// 		.then((response) => response.json())
-	// 		.then((data) => {
-	// 			setUserData(data.user);
-	// 			dispatch(readProfile(data.user));
-	// 		})
-	// 		.catch((error) => {
-	// 			console.error('Error:', error);
-	// 		});
-	// }, []);
+	useEffect(() => {
+		const fetchInfo = async () => {
+			try {
+				const res = await authApi.secret();
+
+				setUserData(res.user);
+				dispatch(readProfile(res.user));
+			} catch (error) {
+				console.error('Error when fetching user: ', error);
+			}
+		};
+		fetchInfo();
+	}, []);
 
 	return (
 		<View style={styles.container}>

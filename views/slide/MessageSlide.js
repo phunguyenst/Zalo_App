@@ -13,7 +13,6 @@ const MessageSlide = createSlice({
 	reducers: {
 		readMessage: (state, action) => {
 			state.messages = action.payload;
-			console.log('messages: ', action.payload);
 		},
 		setMessageDetails: (state, action) => {
 			state.messageDetails = action.payload;
@@ -23,8 +22,16 @@ const MessageSlide = createSlice({
 		},
 		deleteMessage: (state, action) => {
 			state.messages = state.messages.filter(
-				(message) => message.id !== action.payload
+				(message) => message.messageId !== action.payload
 			);
+		},
+		recalledMessage: (state, action) => {
+			const index = state.messages.findIndex(
+				(message) => message.messageId === action.payload
+			);
+			if (index !== -1) {
+				state.messages[index].isRecalled = true;
+			}
 		},
 		setMessages: (state, action) => {
 			state.messages = action.payload;
@@ -32,7 +39,13 @@ const MessageSlide = createSlice({
 	},
 });
 
-export const { readMessage, setMessageDetails, addMessage, setMessages, deleteMessage } =
-	MessageSlide.actions;
+export const {
+	readMessage,
+	setMessageDetails,
+	addMessage,
+	setMessages,
+	deleteMessage,
+	recalledMessage,
+} = MessageSlide.actions;
 export const selectMessages = (state) => state.message.messages;
 export default MessageSlide.reducer;
