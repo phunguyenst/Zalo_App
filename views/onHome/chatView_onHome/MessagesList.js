@@ -112,7 +112,7 @@ const MessagesList = () => {
 				{messages
 					.filter(
 						(message) =>
-							!message.deletedUserIds.includes(profile.userID)
+							message.deletedUserIds && !message.deletedUserIds.includes(profile.userID)
 					)
 					.map((message) => (
 						<Message
@@ -218,12 +218,12 @@ const MessagesList = () => {
 																.length > 2
 																? item?.avatar
 																: item?.membersInfo?.find(
-																		(
-																			member
-																		) =>
-																			member.userID !==
-																			profile?.userID
-																  )?.profilePic,
+																	(
+																		member
+																	) =>
+																		member.userID !==
+																		profile?.userID
+																)?.profilePic,
 													}}
 													style={{ marginRight: 10 }}
 												/>
@@ -235,12 +235,12 @@ const MessagesList = () => {
 																.length > 2
 																? item?.name
 																: item?.membersInfo?.find(
-																		(
-																			member
-																		) =>
-																			member.userID !==
-																			profile?.userID
-																  )?.fullName
+																	(
+																		member
+																	) =>
+																		member.userID !==
+																		profile?.userID
+																)?.fullName
 														}
 														titleStyle={{
 															fontSize: 18,

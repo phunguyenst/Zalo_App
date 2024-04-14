@@ -40,6 +40,7 @@ const Search = ({ navigation, route }) => {
 						borderBottomWidth: 1,
 					}}
 					onPress={() => handleClickItemSearch(result)}
+					key={index}
 				>
 					<Image
 						source={
@@ -55,8 +56,8 @@ const Search = ({ navigation, route }) => {
 						}}
 					/>
 					<View>
-						<Text key={index}>{result?.fullName}</Text>
-						<Text key={index}>{result?.phoneNumber}</Text>
+					<Text>{result?.fullName}</Text> 
+            <Text>{result?.phoneNumber}</Text>
 					</View>
 				</TouchableOpacity>
 			))}
