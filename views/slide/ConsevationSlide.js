@@ -13,6 +13,10 @@ const conservationSlide = createSlice({
 			console.log(action.payload);
 			state.conversations = action.payload;
 		},
+		setConversations: (state, action) => {
+			state.conversations = action.payload;
+			console.log('state: ', state.conversations);
+		},
 		setConversationDetails: (state, action) => {
 			state.conversationDetails = action.payload;
 			console.log('conversationDetails', action.payload);
@@ -31,10 +35,21 @@ const conservationSlide = createSlice({
 					],
 				};
 			}
-			console.log(
-				'Updated members in conversationDetails',
-				state.conversationDetails
-			);
+		},
+		removeConversation: (state, action) => {
+			if (
+				state.conversationDetails &&
+				state.conversationDetails.conversationId ===
+					action.payload.conversationId
+			) {
+				state.conversationDetails = null;
+
+				state.conversations = state.conversations.filter(
+					(conversation) =>
+						conversation.conversationId !==
+						action.payload.conversationId
+				);
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -50,7 +65,9 @@ const conservationSlide = createSlice({
 export const {
 	readConversation,
 	setConversationDetails,
+	setConversations,
 	updateConversationMembers,
+	removeConversation,
 } = conservationSlide.actions;
 export const setConversation = (state) => state.conservation.conversations;
 export default conservationSlide.reducer;

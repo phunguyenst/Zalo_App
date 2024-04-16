@@ -1,16 +1,41 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import {
+	View,
+	Text,
+	Image,
+	TouchableOpacity,
+	StyleSheet,
+	Button,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalAddMember from './ModalAddMember';
 import conversationApi from '../../api/conversationApi';
-import { updateConversationMembers } from '../slide/ConsevationSlide';
+import {
+	removeConversation,
+	updateConversationMembers,
+} from '../slide/ConsevationSlide';
+import { useNavigation } from '@react-navigation/native';
+import Modal from 'react-native-modal';
 
 const SettingGroup = () => {
+	const navigation = useNavigation();
 	const dispatch = useDispatch();
-	const [modalVisible, setModalVisible] = useState(false);
 	const conversationDetails = useSelector(
 		(state) => state.conservation?.conversationDetails
 	);
+	const profile = useSelector((state) => state.profile?.profile);
+
+	const [modalVisible, setModalVisible] = useState(false);
+	const [notiModal, setNotiModal] = useState(false);
+	const [notiMessage, setNotiMessage] = useState('');
+	const [role, setRole] = useState([]);
+
+	useEffect(() => {
+		const roleUser = conversationDetails.participantIds.find(
+			(participant) => participant.participantId === profile.userID
+		);
+		setRole(roleUser);
+	});
 
 	const handlerAddMember = () => {
 		setModalVisible(true);
@@ -19,6 +44,10 @@ const SettingGroup = () => {
 	const closeModal = () => {
 		setModalVisible(false);
 	};
+	const showNoti = (message) => {
+		setNotiMessage(message);
+		setNotiModal(true);
+	};
 
 	const handlerConfirmAddMembers = async (checkedFriends) => {
 		try {
@@ -26,7 +55,6 @@ const SettingGroup = () => {
 				conversationDetails.conversationId,
 				checkedFriends
 			);
-			console.log(res);
 			if (res) {
 				dispatch(
 					updateConversationMembers({
@@ -42,8 +70,51 @@ const SettingGroup = () => {
 		}
 	};
 	const handlerShowListMember = () => {};
-	const handlerRemoveHistory = () => {};
-	const handlerLeaveGroup = () => {};
+	const handlerRemoveGroup = async () => {
+		try {
+			const res = await conversationApi.deleteConversation(
+				conversationDetails.conversationId
+			);
+			if (res) {
+				dispatch(
+					removeConversation(conversationDetails.conversationId)
+				);
+				navigation.navigate('Home');
+			}
+		} catch (error) {
+			console.error('Error when delete group: ', error);
+		}
+	};
+	const handlerLeaveGroup = async () => {
+		if (conversationDetails.participantIds.length === 3) {
+			showNoti('Số thành viên tối thiểu phải là 3 người');
+			return;
+		}
+		try {
+			let otherOwner;
+			if (role.role === 'owner') {
+				otherOwner = conversationDetails.participantIds.find(
+					(participant) =>
+						participant.participantId !== profile.userID
+				);
+			} else {
+				otherOwner = conversationDetails.participantIds.find(
+					(participant) =>
+						participant.participantId === profile.userID
+				);
+			}
+			const res = await conversationApi.leaveGroup(
+				conversationDetails.conversationId,
+				profile.userID,
+				otherOwner
+			);
+			if (res) {
+				navigation.navigate('Home');
+			}
+		} catch (error) {
+			console.error('Error when leave group: ', error);
+		}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -68,12 +139,14 @@ const SettingGroup = () => {
 				>
 					<Text>Danh sách thành viên</Text>
 				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.optionItem}
-					onPress={handlerRemoveHistory}
-				>
-					<Text style={{ color: 'red' }}>Xóa lịch sử trò chuyện</Text>
-				</TouchableOpacity>
+				{role.role === 'owner' && (
+					<TouchableOpacity
+						style={styles.optionItem}
+						onPress={handlerRemoveGroup}
+					>
+						<Text style={{ color: 'red' }}>Giải tán nhóm</Text>
+					</TouchableOpacity>
+				)}
 				<TouchableOpacity
 					style={styles.optionItem}
 					onPress={handlerLeaveGroup}
@@ -86,6 +159,25 @@ const SettingGroup = () => {
 				onClose={closeModal}
 				onConfirm={handlerConfirmAddMembers}
 			/>
+
+			<Modal
+				animationType="slide"
+				isVisible={notiModal}
+				onBackdropPress={() => setNotiModal(false)}
+				onRequestClose={() => {
+					setNotiModal(!notiModal);
+				}}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<Text style={styles.modalText}>{notiMessage}</Text>
+						<Button
+							title="Đóng"
+							onPress={() => setNotiModal(!notiModal)}
+						/>
+					</View>
+				</View>
+			</Modal>
 		</View>
 	);
 };
@@ -134,5 +226,30 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: '#ddd',
 		padding: 10,
+	},
+	centeredView: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: 22,
+	},
+	modalView: {
+		margin: 20,
+		backgroundColor: 'white',
+		borderRadius: 20,
+		padding: 35,
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5,
+	},
+	modalText: {
+		marginBottom: 15,
+		textAlign: 'center',
 	},
 });

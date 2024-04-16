@@ -82,7 +82,7 @@ const CreateGroup = () => {
 				avatar: blob,
 			});
 			if (res) {
-				dispatch(setConversationDetails(res.conversationId));
+				dispatch(setConversationDetails(res.conversation));
 				navigation.navigate('ChatDetail');
 			}
 		} catch (error) {
