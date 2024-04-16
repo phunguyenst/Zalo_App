@@ -8,7 +8,6 @@ import {
 	StyleSheet,
 	Image,
 	CheckBox,
-	Alert, // Import Alert to show error messages
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';

@@ -48,10 +48,8 @@ const HeaderChat = ({ navigation }) => {
 					}}
 				/>
 
-				<View style={{ flex: 1 }}>
-					<Text
-						style={{ fontSize: 20, color: 'white', marginLeft: 20 }}
-					>
+				<View style={{ flex: 1, marginLeft: 20 }}>
+					<Text style={{ fontSize: 20, color: 'white' }}>
 						{conversationDetails.participantIds.length > 2
 							? conversationDetails.name
 							: conversationDetails?.membersInfo?.find(
@@ -59,6 +57,12 @@ const HeaderChat = ({ navigation }) => {
 										member.userID !== profile?.userID
 							  )?.fullName}
 					</Text>
+					{conversationDetails.participantIds.length > 2 && (
+						<View>
+							{conversationDetails.participantIds.length} thành
+							viên
+						</View>
+					)}
 				</View>
 				<View
 					style={{
