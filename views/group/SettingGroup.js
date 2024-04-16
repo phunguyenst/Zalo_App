@@ -16,6 +16,7 @@ import {
 } from '../slide/ConsevationSlide';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
+import ModalListMember from './ModalListMember';
 
 const SettingGroup = () => {
 	const navigation = useNavigation();
@@ -26,6 +27,7 @@ const SettingGroup = () => {
 	const profile = useSelector((state) => state.profile?.profile);
 
 	const [modalVisible, setModalVisible] = useState(false);
+	const [listMemberModal, setListMemberModal] = useState(false);
 	const [notiModal, setNotiModal] = useState(false);
 	const [notiMessage, setNotiMessage] = useState('');
 	const [role, setRole] = useState([]);
@@ -37,12 +39,11 @@ const SettingGroup = () => {
 		setRole(roleUser);
 	});
 
-	const handlerAddMember = () => {
-		setModalVisible(true);
-	};
-
 	const closeModal = () => {
 		setModalVisible(false);
+	};
+	const closeModalListMembers = () => {
+		setListMemberModal(false);
 	};
 	const showNoti = (message) => {
 		setNotiMessage(message);
@@ -69,7 +70,12 @@ const SettingGroup = () => {
 			setModalVisible(false);
 		}
 	};
-	const handlerShowListMember = () => {};
+	const handlerAddMember = () => {
+		setModalVisible(true);
+	};
+	const handlerShowListMember = () => {
+		setListMemberModal(true);
+	};
 	const handlerRemoveGroup = async () => {
 		try {
 			const res = await conversationApi.deleteConversation(
@@ -158,6 +164,10 @@ const SettingGroup = () => {
 				isVisible={modalVisible}
 				onClose={closeModal}
 				onConfirm={handlerConfirmAddMembers}
+			/>
+			<ModalListMember
+				isVisible={listMemberModal}
+				onClose={closeModalListMembers}
 			/>
 
 			<Modal
