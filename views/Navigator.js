@@ -14,7 +14,7 @@ import VerifierSignup from '../screens/VerifierSignup';
 import Home from '../screens/Home';
 import Verifier from '../screens/Verifier';
 import ChatDetail from './onHome/chatView_onHome/ChatDetail';
-import infoScreen from './onHome/accountView_onHome/InfomationDetai';
+import infoScreen from './onHome/profileUser_onHome/InfomationDetai';
 import HeaderChat from './onHome/chatView_onHome/HeaderChat';
 import HeaderNavigator from './HeaderNavigator';
 import Search from '../screens/Search';
@@ -23,6 +23,9 @@ import HeaderBack from './HeaderBack';
 import socketService from '../utils/socketService';
 import { SocketProvider } from './socketContext';
 import CreateGroup from '../screens/CreateGroup';
+import AddFriendScreen from '../screens/AddFriend';
+import FriendInfo from '../screens/FriendInfoWhenRequestAdd';
+import ShowRequestAddFriend from '../screens/ShowSentRecivedFriend';
 
 const Stack = createStackNavigator();
 
@@ -122,6 +125,27 @@ const Navigator = () => {
 									// header: () => <HeaderBack />,
 								}
 							}
+						/>
+						<Stack.Screen
+							name="AddFriendScreen"
+							component={AddFriendScreen}
+							options={{
+								headerShown:true
+							}}
+						/>
+						<Stack.Screen
+							name="FriendInfo"
+							component={FriendInfo}
+							options={{
+								headerShown:true
+							}}
+						/>
+							<Stack.Screen
+							name="ShowRequestAddFriend"
+							component={ShowRequestAddFriend}
+							options={{
+								headerShown:true
+							}}
 						/>
 					</Stack.Navigator>
 				</PersistGate>

@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Chat from './onHome/ChatView';
 import Contact from './onHome/ContactView';
 import Note from './onHome/NoteView';
-import Account from './onHome/AccountView';
+import Account from './onHome/ProfileUser';
 
 const Tab = createBottomTabNavigator();
 const BottomNavigator = () => {

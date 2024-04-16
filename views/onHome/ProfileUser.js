@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import infoScreen from './accountView_onHome/InfomationDetai';
+import infoScreen from './profileUser_onHome/InfomationDetai';
 import { Avatar, Badge, Card, Divider, Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { readProfile, clearProfile } from '../slide/ProfileSlide';

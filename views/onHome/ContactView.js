@@ -1,79 +1,61 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Avatar, Badge, Card, Divider, Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setProfile,
+  setListRequestAddFriendsSent,
+  setListRequestAddFriendsReceived,
+  setFriends,
+  setSentRequests,
+  setReceivedRequests
+} from "../slide/InfoUserSlide";
+import userApi from '../../api/userApi';
 const ContactView = ({ navigation }) => {
-  const list = [
-    {
-      id: 1,
-      name: 'John',
-      image: require("../onHome/image_view/avtchat_01.jpg"),
-      message: 'Hello, how are you?'
-    },
-    {
-      id: 2,
-      name: 'Bob',
-      message: 'I am good, thank you.',
-      image: require("../onHome/image_view/avtchat_02.jpg"),
-
-    },
-    {
-      id: 3,
-      name: "Jack",
-      image: require("../onHome/image_view/avtchat_03.jpg"),
-      message: 'Where are you now?'
-    },
-    {
-      id: 4,
-      name: "Conor",
-      image: require("../onHome/image_view/avtchat_04.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 5,
-      name: "Khabib",
-      image: require("../onHome/image_view/avtchat_05.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 6,
-      name: "Anable",
-      image: require("../onHome/image_view/avtchat_06.jpg"),
-      message: 'I am watch tv.',
-    },
-    {
-      id: 7,
-      name: "Tony",
-      image: require("../onHome/image_view/avtchat_07.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 8,
-      name: "Dustin",
-      image: require("../onHome/image_view/avtchat_08.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 9,
-      name: "Max",
-      image: require("../onHome/image_view/avtchat_09.jpg"),
-      message: 'I am in the office.'
-    },
-    {
-      id: 10,
-      name: "Jon",
-      image: require("../onHome/image_view/avtchat_10.jpg"),
-      message: 'I am in the office.'
-    },
-
-  ]
   const [selectedTab, setSelectedTab] = useState('Bạn bè');
-  const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
+  const [friendProfiles, setFriendProfiles] = useState([]);
+  // const sortedList = friendProfiles.sort((a, b) => a.fullName.localeCompare(b.fullName));
   const addGroup = (props) => <MaterialIcons name="group-add" size={25} color="#1d92fe" />;
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.profile.profile);
 
+  const handleDeleteFriend = async (friendId) => {
+    try {
+      const response = await userApi.deleteFriend(profile?.userID, friendId);
+      console.log('Delete friend successfully');
+      fetchUserInfos(); 
+    } catch (error) {
+      console.log('Error when delete friend:', error);
+    }
+  }
+  const fetchUserInfos = async () => {
+    try {
+      const response = await userApi.inFoUser(profile?.userID);
+      const userData = response?.user
+      dispatch(setProfile({ profile: userData }));
+      dispatch(setListRequestAddFriendsSent({ listRequestAddFriendsSent: userData.listRequestAddFriendsSent }));
+      dispatch(setListRequestAddFriendsReceived({ listRequestAddFriendsReceived: userData.listRequestAddFriendsReceived }));
+      const friendProfiles = await Promise.all(userData.friends.map(id => userApi.findUserById(id)));
+      dispatch(setFriends({ friends: friendProfiles }));
+      setFriendProfiles(friendProfiles);
+      const sentRequests = await Promise.all(userData.listRequestAddFriendsSent.map(id => userApi.findUserById(id)));
+      dispatch(setSentRequests(sentRequests));
+      const receivedRequests = await Promise.all(userData.listRequestAddFriendsReceived.map(id => userApi.findUserById(id)));
+      dispatch(setReceivedRequests(receivedRequests));
+      console.log('fetchUserInfo:', response?.user);
+    } catch (error) {
+      console.log('fetchUserInfo:', error);
+    }
+  }
+  useEffect(() => {
+    fetchUserInfos();
+  }, []);
+
+  console.log('FriendProfiles:', friendProfiles);
   return (
     <ScrollView
       nestedScrollEnabled
@@ -106,26 +88,34 @@ const ContactView = ({ navigation }) => {
           {selectedTab === 'Bạn bè' ? (
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: "column" }}>
-                <Card.Title
-                  title="Lời mời kết bạn"
-                  titleStyle={{ marginLeft: 15, fontSize: 18, fontWeight: '600' }}
-                  left={(props) =>
-                    <View style={{ backgroundColor: '#1a79fa', padding: 5, borderRadius: 5, alignItems: "center" }}>
-                      <Ionicons name="people-sharp" size={24} color="white" />
-                    </View>
-                  }
-                />
-                <Card.Title
-                  title="Lời mời kết bạn"
-                  subtitle="Các liên hệ có dùng Zalo"
-                  titleStyle={{ marginLeft: 10, fontSize: 18, fontWeight: '600' }}
-                  left={(props) =>
-                    <View style={{ backgroundColor: '#1a79fa', padding: 5, borderRadius: 5, alignItems: "center" }}>
-                      <AntDesign name="contacts" size={24} color="white" />
-                    </View>
-                  }
-                  subtitleStyle={{ marginLeft: 10, fontSize: 14 }}
-                />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ShowRequestAddFriend")}
+                >
+                  <Card.Title
+                    title="Lời mời kết bạn"
+                    titleStyle={{ marginLeft: 15, fontSize: 18, fontWeight: '600' }}
+                    left={(props) =>
+                      <View style={{ backgroundColor: '#1a79fa', padding: 5, borderRadius: 5, alignItems: "center" }}>
+                        <Ionicons name="people-sharp" size={24} color="white" />
+                      </View>
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AddFriendScreen')}
+                >
+                  <Card.Title
+                    title="Thêm bạn bè"
+                    subtitle="Các liên hệ có dùng Zalo"
+                    titleStyle={{ marginLeft: 10, fontSize: 18, fontWeight: '600' }}
+                    left={(props) =>
+                      <View style={{ backgroundColor: '#1a79fa', padding: 5, borderRadius: 5, alignItems: "center" }}>
+                        <AntDesign name="adduser" size={24} color="white" />
+                      </View>
+                    }
+                    subtitleStyle={{ marginLeft: 10, fontSize: 14 }}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={{ flex: 1 }}>
                 <Button icon="" mode="elevated" onPress={() => console.log('Pressed')}
@@ -137,24 +127,29 @@ const ContactView = ({ navigation }) => {
               <View style={{ flex: 8 }}>
 
                 <FlatList
-                  data={sortedList}
+                  data={friendProfiles}
                   renderItem={({ item, index }) => {
                     return (
                       <View>
-                        {index === 0 || item.name.charAt(0) !== sortedList[index - 1].name.charAt(0) ? (
-                          // Render header if first item or first character of name is different from previous
+                        {index === 0 || item.user.fullName.charAt(0) !== friendProfiles[index - 1].user.fullName.charAt(0) ? (
                           <View style={styles.headerContainer}>
-                            <Text style={styles.headerText}>{item.name.charAt(0)}</Text>
+                            <Text style={styles.headerText}>{item.user.fullName.charAt(0)}</Text>
                           </View>
                         ) : null}
 
                         <Card.Title
-                          title={item.name}
-                          left={(props) => <Avatar.Image size={55} source={item.image} style={{ marginRight: 10 }} />}
+                          title={item.user.fullName}
+                          left={(props) => <Avatar.Image size={55} source={{ uri: item.user.profilePic }} style={{ marginRight: 10 }} />}
                           right={(props) => (
                             <View style={{ flexDirection: "row" }}>
-                              <Feather name="phone" size={24} color="black" />
-                              <Feather name="video" size={24} color="black" />
+                              {/* <Feather name="phone" size={24} color="black" />
+                              <Feather name="video" size={24} color="black" /> */}
+                              <TouchableOpacity
+                                  onPress={() => handleDeleteFriend(item.user.userID)} 
+                                style = {{borderRadius: 10, backgroundColor:"red", padding: 5, margin: 5, height: 35, width: 70, alignItems: "center", justifyContent: "center"}}
+                              >
+                                <Text style={{color: "white"}}>Huỷ kết bạn</Text>
+                              </TouchableOpacity>
                             </View>
                           )}
                         />
@@ -181,21 +176,8 @@ const ContactView = ({ navigation }) => {
                   <Avatar.Icon size={70} icon={addGroup} style={{ backgroundColor: "#e9f5ff" }} />
                   <Text>Create new group</Text>
                 </View>
-                {/* <View>
-                  {sortedList.map((item, index) => (
-                    <View key={index} style={{ flexDirection: "row", flexWrap: "wrap", width: 55, height: 55 }}>
-                      {item.members && item.members.slice(0, 3).map((member, index) => (
-                        <Avatar.Image key={index} size={27.5} source={member.image} />
-                      ))}
-                      <View style={{ width: 27.5, height: 27.5, borderRadius: 13.75, backgroundColor: "#e9f5ff", justifyContent: "center", alignItems: "center" }}>
-                        <Text>{item.members ? item.members.length : 0}</Text>
-                      </View>
-                    </View>
-                  ))}
-                </View> */}
               </View>
             </View>
-
           )}
         </View>
       </View>
