@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
@@ -10,6 +10,9 @@ const HeaderChat = ({ navigation }) => {
 		(state) => state.conservation.conversationDetails
 	);
 	const profile = useSelector((state) => state.profile.profile);
+	const handlerSetting = () => {
+		navigation.navigate('Setting');
+	};
 
 	return (
 		<LinearGradient
@@ -26,12 +29,30 @@ const HeaderChat = ({ navigation }) => {
 				<TouchableOpacity onPress={() => navigation.goBack()}>
 					<AntDesign name="arrowleft" size={24} color="white" />
 				</TouchableOpacity>
+				<Image
+					source={{
+						uri:
+							conversationDetails.participantIds.length > 2
+								? conversationDetails.avatar
+								: conversationDetails?.membersInfo?.find(
+										(member) =>
+											member.userID !== profile?.userID
+								  )?.profilePic,
+					}}
+					style={{
+						height: 40,
+						width: 40,
+						borderRadius: 20,
+						backgroundColor: 'white',
+						marginLeft: 20,
+					}}
+				/>
 
 				<View style={{ flex: 1 }}>
 					<Text
 						style={{ fontSize: 20, color: 'white', marginLeft: 20 }}
 					>
-						{conversationDetails.length > 2
+						{conversationDetails.participantIds.length > 2
 							? conversationDetails.name
 							: conversationDetails?.membersInfo?.find(
 									(member) =>
@@ -57,6 +78,7 @@ const HeaderChat = ({ navigation }) => {
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={{ marginRight: 10, marginLeft: 10 }}
+						onPress={handlerSetting}
 					>
 						<Ionicons name="options" size={20} color="white" />
 					</TouchableOpacity>

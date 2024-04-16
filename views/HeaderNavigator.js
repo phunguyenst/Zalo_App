@@ -13,7 +13,6 @@ const HeaderNavigator = () => {
 	};
 
 	const handleCreateGroup = () => {
-		console.log('create group');
 		navigation.navigate('CreateGroup');
 	};
 
@@ -35,7 +34,6 @@ const HeaderNavigator = () => {
 				<View
 					style={{
 						flex: 1,
-						backgroundColor: 'red',
 						marginHorizontal: 20,
 					}}
 				>

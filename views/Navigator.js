@@ -26,6 +26,7 @@ import CreateGroup from '../screens/CreateGroup';
 import AddFriendScreen from '../screens/AddFriend';
 import FriendInfo from '../screens/FriendInfoWhenRequestAdd';
 import ShowRequestAddFriend from '../screens/ShowSentRecivedFriend';
+import Setting from '../screens/Setting';
 
 const Stack = createStackNavigator();
 
@@ -120,31 +121,36 @@ const Navigator = () => {
 						<Stack.Screen
 							name="CreateGroup"
 							component={CreateGroup}
-							options={
-								{
-									// header: () => <HeaderBack />,
-								}
-							}
+							options={{
+								title: 'Tạo nhóm mới',
+							}}
+						/>
+						<Stack.Screen
+							name="Setting"
+							component={Setting}
+							options={{
+								title: 'Tùy chọn',
+							}}
 						/>
 						<Stack.Screen
 							name="AddFriendScreen"
 							component={AddFriendScreen}
 							options={{
-								headerShown:true
+								headerShown: true,
 							}}
 						/>
 						<Stack.Screen
 							name="FriendInfo"
 							component={FriendInfo}
 							options={{
-								headerShown:true
+								headerShown: true,
 							}}
 						/>
-							<Stack.Screen
+						<Stack.Screen
 							name="ShowRequestAddFriend"
 							component={ShowRequestAddFriend}
 							options={{
-								headerShown:true
+								headerShown: true,
 							}}
 						/>
 					</Stack.Navigator>

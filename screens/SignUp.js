@@ -85,7 +85,7 @@ const SignUp = ({ navigation }) => {
 			}
 
 			const response = await fetch(
-				'localhost:5000/api/auth/sign-up-with-phone',
+				'http://localhost:5000/api/auth/sign-up-with-phone',
 				{
 					method: 'POST',
 					body: formData,

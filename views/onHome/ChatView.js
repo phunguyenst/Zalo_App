@@ -64,7 +64,9 @@ const ChatView = ({ navigation, route }) => {
 																		profile?.userID
 															  )?.profilePic,
 												}}
-												style={{ marginRight: 10 }}
+												style={{
+													marginRight: 10,
+												}}
 											/>
 
 											<View style={{ flex: 1 }}>
