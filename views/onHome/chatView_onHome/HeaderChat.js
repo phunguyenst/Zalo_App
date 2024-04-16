@@ -32,7 +32,7 @@ const HeaderChat = ({ navigation }) => {
 				<Image
 					source={{
 						uri:
-							conversationDetails.participantIds.length > 2
+							conversationDetails?.participantIds.length > 2
 								? conversationDetails.avatar
 								: conversationDetails?.membersInfo?.find(
 										(member) =>
@@ -48,17 +48,21 @@ const HeaderChat = ({ navigation }) => {
 					}}
 				/>
 
-				<View style={{ flex: 1 }}>
-					<Text
-						style={{ fontSize: 20, color: 'white', marginLeft: 20 }}
-					>
-						{conversationDetails.participantIds.length > 2
+				<View style={{ flex: 1, marginLeft: 20 }}>
+					<Text style={{ fontSize: 20, color: 'white' }}>
+						{conversationDetails?.participantIds.length > 2
 							? conversationDetails.name
 							: conversationDetails?.membersInfo?.find(
 									(member) =>
 										member.userID !== profile?.userID
 							  )?.fullName}
 					</Text>
+					{conversationDetails.participantIds.length > 2 && (
+						<View>
+							{conversationDetails.participantIds.length} thành
+							viên
+						</View>
+					)}
 				</View>
 				<View
 					style={{

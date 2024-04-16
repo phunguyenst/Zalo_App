@@ -8,7 +8,6 @@ import {
 	StyleSheet,
 	Image,
 	CheckBox,
-	Alert, // Import Alert to show error messages
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
@@ -83,7 +82,7 @@ const CreateGroup = () => {
 				avatar: blob,
 			});
 			if (res) {
-				dispatch(setConversationDetails(res.conversationId));
+				dispatch(setConversationDetails(res.conversation));
 				navigation.navigate('ChatDetail');
 			}
 		} catch (error) {
