@@ -15,6 +15,7 @@ const ChatDetail = ({ navigation }) => {
 	);
 	const profile = useSelector((state) => state.profile.profile);
 	const dispatch = useDispatch();
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {

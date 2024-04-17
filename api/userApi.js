@@ -37,8 +37,6 @@ const userApi = {
 	},
 	addFriend: (userId, friendId) => {
 		const data = { userId, friendId };
-		console.log('userId', userId);
-		console.log('friendId', friendId);
 		const url = '/user/add-friend';
 		return axiosClient.put(url, data);
 	},
@@ -60,7 +58,6 @@ const userApi = {
 
 	cancelFriend: (userId, friendId) => {
 		const data = { userId, friendId };
-		console.log('data', data);
 		const url = '/user/cancel-friend';
 		return axiosClient.put(url, data);
 	},

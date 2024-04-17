@@ -1,18 +1,23 @@
-import { View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, Image , Text} from 'react-native';
 import React, { useState } from 'react';
 import EmojiSelector from 'react-native-emoji-selector';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import messageApi from '../../../api/messageApi';
 import { addMessage } from '../../slide/MessageSlide';
 import * as ImagePicker from 'expo-image-picker';
+import Modal from 'react-native-modal';
 // import * as DocumentPicker from 'react-native-document-picker';
 
 const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [imageUri, setImageUri] = useState(null);
+	const [fileUri, setFileUri] = useState(null);
+    const [selectedFileName, setSelectedFileName] = useState(null); 
 	const [showEmojiSelector, setShowEmojiSelector] = useState(false);
 	const dispatch = useDispatch();
+
 	const conversationDetails = useSelector(
 		(state) => state.conservation.conversationDetails
 	);
@@ -27,35 +32,98 @@ const ChatInput = () => {
 			base64: true,
 		});
 		if (!result.canceled) {
-			setMessage('');
 			setImageUri(result.assets[0].uri);
 		}
 	};
+	const pickFile = async () => {
+        try {
+            const file = await DocumentPicker.getDocumentAsync();
+            if (file.assets && file.assets.length > 0) {
+                const selectedFile = {
+                    uri: file.assets[0].uri,
+                    name: file.assets[0].name,
+                };
+                const fileUrl = selectedFile.uri;
+                const fileName = selectedFile.name;
+                console.log("fileUrl", fileUrl);
+                setFileUri(fileUrl);
+                setSelectedFileName(fileName);
+            }
+        } catch (error) {
+            console.error("Error picking document: ", error);
+        }
+    };
+	console.log('fileUri', fileUri);
 
+	// const sendMessage = async (content, type) => {
+	// 	try {
+	// 		let data = new FormData();
+
+	// 		if (type === 'image') {
+	// 			let base64 = await getBase64Image(imageUri);
+	// 			let filename = 'image.jpg';
+	// 			let imageType = 'image/jpg';
+	// 			data.append('content', filename);
+	// 			data.append('file', {
+	// 				uri: imageUri,
+	// 				name: filename,
+	// 				type: imageType,
+	// 			});
+
+	// 			const response = await messageApi.sendMessage({
+	// 				conversationId: conversationDetails.conversationId,
+	// 				content: imageUri,
+	// 				type: 'image',
+	// 			});
+	// 			if (response) {
+	// 				dispatch(
+	// 					addMessage({
+	// 						content: imageUri,
+	// 						senderId: profile.userID,
+	// 						isMyMessage: true,
+	// 						type: 'image',
+	// 					})
+	// 				);
+	// 				setImageUri('');
+	// 			}
+	// 		}
+
+	// 		if (type === 'text') {
+	// 			const response = await messageApi.sendMessage({
+	// 				conversationId: conversationDetails.conversationId,
+	// 				content: message,
+	// 				type: 'text',
+	// 			});
+	// 			if (response.message) {
+	// 				dispatch(
+	// 					addMessage({
+	// 						...response.message[0],
+	// 						isMyMessage: true,
+	// 					})
+	// 				);
+	// 				setMessage('');
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error when sent message: ', error);
+	// 	}
+	// };
 	const sendMessage = async (content, type) => {
+		console.log("conservationDetails", conversationDetails.conversationId);
 		try {
-			let data = new FormData();
-
 			if (type === 'image') {
-				let base64 = await getBase64Image(imageUri);
-				let filename = 'image.jpg';
-				let imageType = 'image/jpg';
-				data.append('content', filename);
-				data.append('file', {
-					uri: imageUri,
-					name: filename,
-					type: imageType,
-				});
-
-				const response = await messageApi.sendMessage({
+				const response = await fetch(imageUri);
+				const blob = await response.blob();
+				const res = await messageApi.sendMessage({
 					conversationId: conversationDetails.conversationId,
-					content: imageUri,
+					content: blob,
 					type: 'image',
 				});
-				if (response) {
+				console.log(res);
+				if (res) {
 					dispatch(
 						addMessage({
-							content: imageUri,
+							content: content,
 							senderId: profile.userID,
 							isMyMessage: true,
 							type: 'image',
@@ -64,45 +132,48 @@ const ChatInput = () => {
 					setImageUri('');
 				}
 			}
-
-			if (type === 'text') {
-				const response = await messageApi.sendMessage({
+			else if (type === 'file') {
+				const response = await fetch(content);
+				const blob = await response.blob();
+				console.log("blob", blob);
+				const res = await messageApi.sendMessage({
 					conversationId: conversationDetails.conversationId,
-					content: message,
-					type: 'text',
+					content: blob,
+					type: 'file',
 				});
-				if (response.message) {
+				if (res) {
 					dispatch(
 						addMessage({
-							...response.message[0],
+							content: content,
+							senderId: profile.userID,
 							isMyMessage: true,
+							type: 'file',
 						})
 					);
-					setMessage('');
+					setFileUri('');
+				}
+				else if (type === 'text') {
+					const response = await messageApi.sendMessage({
+						conversationId: conversationDetails.conversationId,
+						content: content,
+						type: 'text',
+					});
+					if (response.message) {
+						dispatch(
+							addMessage({
+								...response.message[0],
+								isMyMessage: true,
+							})
+						);
+						setMessage('');
+					}
 				}
 			}
 		} catch (error) {
-			console.error('Error when sent message: ', error);
+			console.error('Error when sending message: ', error);
 		}
 	};
 
-	const getBase64Image = async (imageUri) => {
-		return new Promise((resolve, reject) => {
-			let xhr = new XMLHttpRequest();
-			xhr.onload = function () {
-				let reader = new FileReader();
-				reader.onloadend = function () {
-					resolve(reader.result.split(',')[1]);
-				};
-				reader.onerror = reject;
-				reader.readAsDataURL(xhr.response);
-			};
-			xhr.onerror = reject;
-			xhr.responseType = 'blob';
-			xhr.open('GET', imageUri, true);
-			xhr.send(null);
-		});
-	};
 
 	return (
 		<View
@@ -140,6 +211,7 @@ const ChatInput = () => {
 							color="black"
 						/>
 					</TouchableOpacity>
+					
 					<TextInput
 						placeholder="Type a message"
 						style={{
@@ -157,14 +229,18 @@ const ChatInput = () => {
 					{imageUri && (
 						<View
 							style={{
+								backgroundColor: 'transparent',
+								borderWidth: 1,
+								flexDirection:"column",
+								color: 'black',
 								position: 'absolute',
-								bottom: 120,
+								bottom: 75,
 								left: 10,
 								height: 100,
 								width: 200,
 							}}
 						>
-							{/* <Text> chọn ảnh</Text> */}
+							<Text>Chọn ảnh</Text>
 							<Image
 								source={{ uri: imageUri }}
 								style={{
@@ -174,7 +250,25 @@ const ChatInput = () => {
 							/>
 						</View>
 					)}
-					<TouchableOpacity>
+					
+					{fileUri && (
+						<View
+							style={{
+								borderColor:"black",
+								borderWidth: 1,
+								position: 'absolute',
+								bottom: 50,
+								left: 10,
+								height: 50,
+								width: 200,
+							}}
+						>
+							 <Text>chọn file: {selectedFileName}</Text>
+						</View>
+					)}
+					<TouchableOpacity
+						onPress={pickFile}
+					>
 						<Feather name="paperclip" size={20} color="black" />
 					</TouchableOpacity>
 					<TouchableOpacity onPress={pickImage}>
@@ -193,6 +287,8 @@ const ChatInput = () => {
 					onPress={() => {
 						if (imageUri) {
 							sendMessage(imageUri, 'image');
+						} else if (fileUri) {
+							sendMessage(fileUri, 'file');
 						} else if (message.trim() !== '') {
 							sendMessage(message, 'text');
 						}
