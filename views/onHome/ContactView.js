@@ -306,7 +306,7 @@ const ContactView = ({ navigation }) => {
 									alignItems: 'center',
 								}}
 								onPress={() =>
-									navigation.navigate('createGroup')
+									navigation.navigate('CreateGroup')
 								}
 							>
 								<Avatar.Icon

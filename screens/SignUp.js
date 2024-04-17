@@ -11,7 +11,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import firebaseConfig from '../config';
-import * as ImagePicker from 'expo-image-picker';
+import authApi from '../api/authApi';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
 const screenWidth = Dimensions.get('window').width;
@@ -19,35 +19,12 @@ const SignUp = ({ navigation }) => {
 	const [phone, setPhone] = useState('+84');
 	const [password, setPassword] = useState('');
 	const [fullName, setFullName] = useState('');
+	const [dateOfBirth, setDateOfBirth] = useState('');
 	const [gender, setGender] = useState('');
+	const [signupError, setSignUpError] = useState(false);
+	const [signupErrorMessage, setSignUpErrorMessage] = useState('');
 	const [verificationId, setVerificationId] = useState(null);
-	const [avatar, setAvatar] = useState(null);
-	const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
-	useEffect(() => {
-		(async () => {
-			const galleryStatus =
-				await ImagePicker.requestMediaLibraryPermissionsAsync();
-			setHasGalleryPermission(galleryStatus.status === 'granted');
-		})();
-	}, []);
-	const handleImagePickerPress = async () => {
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
-			aspect: [4, 3],
-			quality: 1,
-		});
-
-		if (!result.canceled) {
-			setAvatar(result.uri);
-		} else {
-			console.log('No image selected');
-		}
-	};
-	if (hasGalleryPermission === false) {
-		return <Text>No access to internal storage</Text>;
-	}
-
+	
 	const recaptchaVerifier = useRef(null);
 
 	const sendVerification = async () => {
@@ -74,34 +51,26 @@ const SignUp = ({ navigation }) => {
 			formData.append('password', password);
 			formData.append('fullName', fullName);
 			formData.append('gender', gender);
-			if (avatar) {
-				let uriParts = avatar.split('.');
-				let fileType = uriParts[uriParts.length - 1];
-				formData.append('avatar', {
-					uri: avatar,
-					name: `photo.${fileType}`,
-					type: `image/${fileType}`,
-				});
-			}
-
-			const response = await fetch(
-				'http://localhost:5000/api/auth/sign-up-with-phone',
-				{
-					method: 'POST',
-					body: formData,
-				}
-			);
-
-			const data = await response.json();
-			console.log('Status:', response.status, 'Data:', data);
-
-			if (response.ok) {
-				sendVerification();
-			} else {
-				// handle error
-			}
+			formData.append('dateOfBirth', dateOfBirth);
+			const response = await authApi.signUpWithPhone(formData);
+			console.log(response.status);
+			console.log('Data:', response.data);
+			sendVerification();
 		} catch (error) {
 			console.error('Error logging in:', error);
+			switch (error.response.status) {
+				case 400:
+					setSignUpError(true);
+					setSignUpErrorMessage('Số điện thoại đã được sử dụng, vui lòng dùng số khác');
+					break;
+				case 500:
+					setSignUpError(true);
+					setSignUpErrorMessage('Đăng ký không thành công. Vui lòng thử lại.');
+					break;
+				default:
+					setSignUpError(true);
+					setSignUpErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại.');
+			}
 		}
 	};
 	return (
@@ -125,6 +94,26 @@ const SignUp = ({ navigation }) => {
 						onChangeText={(text) => {
 							setPhone(text);
 						}}
+					></TextInput>
+					<AntDesign
+						name="close"
+						size={24}
+						color="black"
+						style={{ position: 'absolute', right: 25, top: 10 }}
+					/>
+				</View>
+				<View style={{ flexDirection: 'row', marginBottom: 30 }}>
+					<TextInput
+						placeholder="04/03/2000"
+						style={{
+							height: 40,
+							width: 350,
+							borderColor: 'gray',
+							backgroundColor: 'white',
+							borderWidth: 0,
+							borderBottomWidth: 1,
+						}}
+						onChangeText={(text) => setDateOfBirth(text)}
 					></TextInput>
 					<AntDesign
 						name="close"
@@ -206,26 +195,12 @@ const SignUp = ({ navigation }) => {
 						<Picker.Item label="Nữ" value="female" />
 					</Picker>
 				</View>
-				<View
-					style={{
-						flexDirection: 'row',
-						alignItems: 'center',
-						marginBottom: 30,
-					}}
-				>
-					<TouchableOpacity
-						style={styles.avatarButton}
-						onPress={handleImagePickerPress}
-					>
-						<Text style={{ color: 'white' }}>Choose Avatar</Text>
-					</TouchableOpacity>
-					{avatar && (
-						<Image
-							source={{ uri: avatar }}
-							style={{ flex: 1 / 2 }}
-						/>
-					)}
-				</View>
+
+				{signupError && (
+							<Text style={{ color: 'red' }}>
+								{signupErrorMessage}
+							</Text>
+						)}
 
 				<View style={{ marginTop: 20 }}>
 					<TouchableOpacity

@@ -53,14 +53,23 @@ export default function FriendInfo({ route, navigation }) {
 					style={styles.profileImage}
 				/>
 				<Text style={styles.profileName}>{friendName}</Text>
-				<View style={styles.buttonContainer}>
-					<Button
-						title="Nhắn tin"
+				<View style={{flexDirection:"row" }}>
+					<TouchableOpacity
+
+						
 						onPress={() => {
 							navigation.navigate('ChatDetail');
 						}}
-					/>
-					<Button title="Gửi kết bạn" onPress={handleFriendRequest} />
+						style= {{backgroundColor:"#777",padding:10,borderRadius:10,marginRight:10}}
+					>
+						<Text>Nhắn tin</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={handleFriendRequest} 
+						style= {{backgroundColor:"blue", padding:10,borderRadius:10, }}
+					>
+
+						<Text>Gửi kết bạn</Text>
+					</TouchableOpacity>
 				</View>
 			</View>
 		</View>
@@ -90,10 +99,5 @@ const styles = StyleSheet.create({
 		color: 'black',
 		marginTop: 10,
 	},
-	buttonContainer: {
-		marginTop: 10,
-		width: '80%',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
+	
 });
