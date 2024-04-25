@@ -74,7 +74,6 @@ const CreateGroup = () => {
 
 		try {
 			const response = await fetch(imageUri);
-			console.log(response);
 			const blob = await response.blob();
 			const res = await conversationApi.createConversation({
 				participantIds: [...checkedFriends, profile.userID],
