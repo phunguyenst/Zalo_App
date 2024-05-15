@@ -10,11 +10,13 @@ import {
 import Modal from 'react-native-modal';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
-import { setProfile } from '../../slide/ProfileSlide';
+import { useDispatch, useSelector } from 'react-redux';
+import { readProfile, setProfile } from '../../slide/ProfileSlide';
 import * as ImagePicker from 'expo-image-picker';
 import { selectAuthorization } from '../../slide/LoginSlide';
+import userApi from '../../../api/userApi';
 export default function InformationDetail() {
+	const dispatch = useDispatch();
 	let navigation = useNavigation();
 	const profile = useSelector(setProfile);
 	const authorization = useSelector(selectAuthorization);
@@ -28,38 +30,24 @@ export default function InformationDetail() {
 			quality: 1,
 		});
 
-		if (!result.cancelled) {
-			uploadProfilePic(result?.assets[0]);
+		if (!result.canceled) {
+			uploadProfilePic(result.assets[0].uri);
 		}
 	};
 
 	const uploadProfilePic = async (file) => {
-		let formData = new FormData();
-		formData.append('profilePic', file);
-
-		for (let [key, value] of formData.entries()) {
-			console.log(key, value);
-		}
 		try {
-			const response = await fetch(
-				'localhost:5000/api/user/update-profile-pic',
-				{
-					method: 'PATCH',
-					headers: {
-						Authorization: `Bearer ${authorization}`,
-					},
-					body: formData,
-				}
-			);
+			const response = await fetch(file);
+			const blob = await response.blob();
+			const res = await userApi.updateAvatar(blob);
 
-			if (response) {
-				const responseJson = await response.json();
-				console.log('Profile pic updated successfully:', responseJson);
-			} else {
-				console.error('Failed to update profile pic:', response);
+			if (res) {
+				dispatch(readProfile(res.updatedUser[0]));
 			}
 		} catch (error) {
 			console.error('Error during image upload:', error);
+		} finally {
+			setModalVisible(false);
 		}
 	};
 	const openModal = () => {
