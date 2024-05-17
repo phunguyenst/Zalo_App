@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { readProfile, clearProfile } from '../slide/ProfileSlide';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { selectAuthorization } from '../slide/LoginSlide';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistor } from '../store';
 import authApi from '../../api/authApi';
 const AccountView = () => {
@@ -25,8 +25,10 @@ const AccountView = () => {
 
 	const [userData, setUserData] = useState(null);
 
-	const logout = () => {
-		dispatch(clearProfile());
+	const logout =async () => {
+		await dispatch(clearProfile());
+		await AsyncStorage.clear();
+		
 		persistor.purge().then(() => {
 			navigation.navigate('Welcome');
 		});
@@ -77,7 +79,7 @@ const AccountView = () => {
 							</Card.Content>
 						</Card>
 					</TouchableOpacity>
-					{/* ... other code */}
+				
 				</>
 			)}
 

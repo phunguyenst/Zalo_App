@@ -8,8 +8,6 @@ import messageApi from '../../../api/messageApi';
 import { addMessage } from '../../slide/MessageSlide';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
-// import * as DocumentPicker from 'react-native-document-picker';
-
 const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [imageUri, setImageUri] = useState(null);
@@ -32,6 +30,7 @@ const ChatInput = () => {
 			base64: true,
 		});
 		if (!result.canceled) {
+			setMessage('');
 			setImageUri(result.assets[0].uri);
 		}
 	};
@@ -54,76 +53,47 @@ const ChatInput = () => {
         }
     };
 	console.log('fileUri', fileUri);
-
-	// const sendMessage = async (content, type) => {
-	// 	try {
-	// 		let data = new FormData();
-
-	// 		if (type === 'image') {
-	// 			let base64 = await getBase64Image(imageUri);
-	// 			let filename = 'image.jpg';
-	// 			let imageType = 'image/jpg';
-	// 			data.append('content', filename);
-	// 			data.append('file', {
-	// 				uri: imageUri,
-	// 				name: filename,
-	// 				type: imageType,
-	// 			});
-
-	// 			const response = await messageApi.sendMessage({
-	// 				conversationId: conversationDetails.conversationId,
-	// 				content: imageUri,
-	// 				type: 'image',
-	// 			});
-	// 			if (response) {
-	// 				dispatch(
-	// 					addMessage({
-	// 						content: imageUri,
-	// 						senderId: profile.userID,
-	// 						isMyMessage: true,
-	// 						type: 'image',
-	// 					})
-	// 				);
-	// 				setImageUri('');
-	// 			}
-	// 		}
-
-	// 		if (type === 'text') {
-	// 			const response = await messageApi.sendMessage({
-	// 				conversationId: conversationDetails.conversationId,
-	// 				content: message,
-	// 				type: 'text',
-	// 			});
-	// 			if (response.message) {
-	// 				dispatch(
-	// 					addMessage({
-	// 						...response.message[0],
-	// 						isMyMessage: true,
-	// 					})
-	// 				);
-	// 				setMessage('');
-	// 			}
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Error when sent message: ', error);
-	// 	}
-	// };
+	const getBase64Image = async (imageUri) => {
+		return new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.onload = function () {
+				let reader = new FileReader();
+				reader.onloadend = function () {
+					resolve(reader.result.split(',')[1]);
+				};
+				reader.onerror = reject;
+				reader.readAsDataURL(xhr.response);
+			};
+			xhr.onerror = reject;
+			xhr.responseType = 'blob';
+			xhr.open('GET', imageUri, true);
+			xhr.send(null);
+		});
+	};
 	const sendMessage = async (content, type) => {
-		console.log("conservationDetails", conversationDetails.conversationId);
 		try {
+			let data = new FormData();
+
 			if (type === 'image') {
-				const response = await fetch(imageUri);
-				const blob = await response.blob();
-				const res = await messageApi.sendMessage({
+				let base64 = await getBase64Image(imageUri);
+				let filename = 'image.jpg';
+				let imageType = 'image/jpg';
+				data.append('content', filename);
+				data.append('file', {
+					uri: imageUri,
+					name: filename,
+					type: imageType,
+				});
+
+				const response = await messageApi.sendMessage({
 					conversationId: conversationDetails.conversationId,
-					content: blob,
+					content: imageUri,
 					type: 'image',
 				});
-				console.log(res);
-				if (res) {
+				if (response) {
 					dispatch(
 						addMessage({
-							content: content,
+							content: imageUri,
 							senderId: profile.userID,
 							isMyMessage: true,
 							type: 'image',
@@ -133,14 +103,18 @@ const ChatInput = () => {
 				}
 			}
 			else if (type === 'file') {
-				const response = await fetch(content);
-				const blob = await response.blob();
-				console.log("blob", blob);
-				const res = await messageApi.sendMessage({
-					conversationId: conversationDetails.conversationId,
-					content: blob,
-					type: 'file',
+				let formData = new FormData();
+				formData.append('file', {
+					uri: content,
+					type: 'application/octet-stream', 
+					name: 'uploadfile'
 				});
+				formData.append('conversationId', conversationDetails.conversationId);
+				formData.append('type', 'file');
+			
+				
+				const res = await messageApi.sendMessage(formData);
+				console.log(res);
 				if (res) {
 					dispatch(
 						addMessage({
@@ -151,28 +125,94 @@ const ChatInput = () => {
 						})
 					);
 					setFileUri('');
-				}
-				else if (type === 'text') {
-					const response = await messageApi.sendMessage({
-						conversationId: conversationDetails.conversationId,
-						content: content,
-						type: 'text',
-					});
-					if (response.message) {
-						dispatch(
-							addMessage({
-								...response.message[0],
-								isMyMessage: true,
-							})
-						);
-						setMessage('');
-					}
-				}
+				}   
 			}
-		} catch (error) {
-			console.error('Error when sending message: ', error);
+			else if (type === 'text') {
+				const response = await messageApi.sendMessage({
+					conversationId: conversationDetails.conversationId,
+					content: message,
+					type: 'text',
+				});
+				if (response.message) {
+					dispatch(
+						addMessage({
+							...response.message[0],
+							isMyMessage: true,
+						})
+					);
+					setMessage('');
+				}
+			
 		}
-	};
+		} catch (error) {
+			console.error('Error when sent message: ', error);
+		}
+	}
+	// const sendMessage = async (content, type) => {
+	// 	console.log("conservationDetails", conversationDetails.conversationId);
+	// 	try {
+	// 		if (type === 'image') {
+	// 			const response = await fetch(imageUri);
+	// 			const blob = await response.blob();
+	// 			const res = await messageApi.sendMessage({
+	// 				conversationId: conversationDetails.conversationId,
+	// 				content: blob,
+	// 				type: 'image',
+	// 			});
+	// 			console.log(res);
+	// 			if (res) {
+	// 				dispatch(
+	// 					addMessage({
+	// 						content: content,
+	// 						senderId: profile.userID,
+	// 						isMyMessage: true,
+	// 						type: 'image',
+	// 					})
+	// 				);
+	// 				setImageUri('');
+	// 			}
+	// 		}
+	// 		else if (type === 'file') {
+	// 			const response = await fetch(content);
+	// 			const blob = await response.blob();
+	// 			console.log("blob", blob);
+	// 			const res = await messageApi.sendMessage({
+	// 				conversationId: conversationDetails.conversationId,
+	// 				content: blob,
+	// 				type: 'file',
+	// 			});
+	// 			if (res) {
+	// 				dispatch(
+	// 					addMessage({
+	// 						content: content,
+	// 						senderId: profile.userID,
+	// 						isMyMessage: true,
+	// 						type: 'file',
+	// 					})
+	// 				);
+	// 				setFileUri('');
+	// 			}
+	// 			else if (type === 'text') {
+	// 				const response = await messageApi.sendMessage({
+	// 					conversationId: conversationDetails.conversationId,
+	// 					content: content,
+	// 					type: 'text',
+	// 				});
+	// 				if (response.message) {
+	// 					dispatch(
+	// 						addMessage({
+	// 							...response.message[0],
+	// 							isMyMessage: true,
+	// 						})
+	// 					);
+	// 					setMessage('');
+	// 				}
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error when sending message: ', error);
+	// 	}
+	// };
 
 
 	return (
@@ -240,7 +280,7 @@ const ChatInput = () => {
 								width: 200,
 							}}
 						>
-							<Text>Chọn ảnh</Text>
+							{/* <Text>Chọn ảnh</Text> */}
 							<Image
 								source={{ uri: imageUri }}
 								style={{

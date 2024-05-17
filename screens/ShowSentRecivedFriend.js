@@ -34,6 +34,17 @@ const ShowRequestAddFriend = ({ navigation }) => {
 			console.error('Error when sent friend request:', error);
 		}
 	};
+	const handleCancelFriend = async (friendId) => {
+		try {
+			const response = await userApi.cancelFriend(
+				profile?.userID,
+				friendId
+			);
+			navigation.navigate('Home');
+		} catch (error) {
+			console.error('Error when sent friend request:', error);
+		}
+	}
 
 	return (
 		<ScrollView nestedScrollEnabled>
@@ -225,6 +236,14 @@ const ShowRequestAddFriend = ({ navigation }) => {
 																</Text>
 															</TouchableOpacity>
 															<TouchableOpacity
+																onPress={() => {
+																	handleCancelFriend(
+																		item
+																			.user
+																			.userID
+																	);
+																
+																}}
 																style={{
 																	borderRadius: 10,
 																	backgroundColor:
