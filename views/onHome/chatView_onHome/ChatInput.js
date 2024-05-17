@@ -1,4 +1,4 @@
-import { View, TextInput, TouchableOpacity, Image , Text} from 'react-native';
+import { View, TextInput, TouchableOpacity, Image, Text } from 'react-native';
 import React, { useState } from 'react';
 import EmojiSelector from 'react-native-emoji-selector';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,7 +14,7 @@ const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [imageUri, setImageUri] = useState(null);
 	const [fileUri, setFileUri] = useState(null);
-    const [selectedFileName, setSelectedFileName] = useState(null); 
+	const [selectedFileName, setSelectedFileName] = useState(null);
 	const [showEmojiSelector, setShowEmojiSelector] = useState(false);
 	const dispatch = useDispatch();
 
@@ -36,144 +36,81 @@ const ChatInput = () => {
 		}
 	};
 	const pickFile = async () => {
-        try {
-            const file = await DocumentPicker.getDocumentAsync();
-            if (file.assets && file.assets.length > 0) {
-                const selectedFile = {
-                    uri: file.assets[0].uri,
-                    name: file.assets[0].name,
-                };
-                const fileUrl = selectedFile.uri;
-                const fileName = selectedFile.name;
-                console.log("fileUrl", fileUrl);
-                setFileUri(fileUrl);
-                setSelectedFileName(fileName);
-            }
-        } catch (error) {
-            console.error("Error picking document: ", error);
-        }
-    };
-	console.log('fileUri', fileUri);
+		try {
+			const file = await DocumentPicker.getDocumentAsync();
+			if (file.assets && file.assets.length > 0) {
+				const selectedFile = {
+					uri: file.assets[0].uri,
+					name: file.assets[0].name,
+				};
+				const fileUrl = selectedFile.uri;
+				const fileName = selectedFile.name;
+				setFileUri(fileUrl);
+				setSelectedFileName(fileName);
+			}
+		} catch (error) {
+			console.error('Error picking document: ', error);
+		}
+	};
 
-	// const sendMessage = async (content, type) => {
-	// 	try {
-	// 		let data = new FormData();
-
-	// 		if (type === 'image') {
-	// 			let base64 = await getBase64Image(imageUri);
-	// 			let filename = 'image.jpg';
-	// 			let imageType = 'image/jpg';
-	// 			data.append('content', filename);
-	// 			data.append('file', {
-	// 				uri: imageUri,
-	// 				name: filename,
-	// 				type: imageType,
-	// 			});
-
-	// 			const response = await messageApi.sendMessage({
-	// 				conversationId: conversationDetails.conversationId,
-	// 				content: imageUri,
-	// 				type: 'image',
-	// 			});
-	// 			if (response) {
-	// 				dispatch(
-	// 					addMessage({
-	// 						content: imageUri,
-	// 						senderId: profile.userID,
-	// 						isMyMessage: true,
-	// 						type: 'image',
-	// 					})
-	// 				);
-	// 				setImageUri('');
-	// 			}
-	// 		}
-
-	// 		if (type === 'text') {
-	// 			const response = await messageApi.sendMessage({
-	// 				conversationId: conversationDetails.conversationId,
-	// 				content: message,
-	// 				type: 'text',
-	// 			});
-	// 			if (response.message) {
-	// 				dispatch(
-	// 					addMessage({
-	// 						...response.message[0],
-	// 						isMyMessage: true,
-	// 					})
-	// 				);
-	// 				setMessage('');
-	// 			}
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Error when sent message: ', error);
-	// 	}
-	// };
 	const sendMessage = async (content, type) => {
-		console.log("conservationDetails", conversationDetails.conversationId);
 		try {
 			if (type === 'image') {
 				const response = await fetch(imageUri);
 				const blob = await response.blob();
-				const res = await messageApi.sendMessage({
-					conversationId: conversationDetails.conversationId,
-					content: blob,
-					type: 'image',
-				});
-				console.log(res);
-				if (res) {
-					dispatch(
-						addMessage({
-							content: content,
-							senderId: profile.userID,
-							isMyMessage: true,
-							type: 'image',
-						})
-					);
-					setImageUri('');
+
+				let formData = new FormData();
+				formData.append(
+					'conversationId',
+					conversationDetails.conversationId
+				);
+				formData.append('file', blob);
+				formData.append('type', 'image');
+				const res = await messageApi.sendMessage(formData);
+				if (res && res.message) {
+					res.message.map((m) => {
+						dispatch(addMessage({ ...m, isMyMessage: true }));
+					});
 				}
-			}
-			else if (type === 'file') {
+			} else if (type === 'file') {
 				const response = await fetch(content);
 				const blob = await response.blob();
-				console.log("blob", blob);
-				const res = await messageApi.sendMessage({
+				let formData = new FormData();
+				formData.append(
+					'conversationId',
+					conversationDetails.conversationId
+				);
+				formData.append('file', blob);
+				formData.append('type', 'file');
+				const res = await messageApi.sendMessage(formData);
+				if (res && res.message) {
+					res.message.map((m) => {
+						dispatch(addMessage({ ...m, isMyMessage: true }));
+					});
+				}
+			} else if (type === 'text') {
+				const response = await messageApi.sendMessage({
 					conversationId: conversationDetails.conversationId,
-					content: blob,
-					type: 'file',
+					content: message,
+					type: 'text',
 				});
-				if (res) {
+				if (response.message) {
 					dispatch(
 						addMessage({
-							content: content,
-							senderId: profile.userID,
+							...response.message[0],
 							isMyMessage: true,
-							type: 'file',
 						})
 					);
-					setFileUri('');
-				}
-				else if (type === 'text') {
-					const response = await messageApi.sendMessage({
-						conversationId: conversationDetails.conversationId,
-						content: content,
-						type: 'text',
-					});
-					if (response.message) {
-						dispatch(
-							addMessage({
-								...response.message[0],
-								isMyMessage: true,
-							})
-						);
-						setMessage('');
-					}
 				}
 			}
 		} catch (error) {
 			console.error('Error when sending message: ', error);
+		} finally {
+			setFileUri('');
+			setImageUri('');
+			setMessage('');
 		}
 	};
-
 
 	return (
 		<View
@@ -211,7 +148,7 @@ const ChatInput = () => {
 							color="black"
 						/>
 					</TouchableOpacity>
-					
+
 					<TextInput
 						placeholder="Type a message"
 						style={{
@@ -231,7 +168,7 @@ const ChatInput = () => {
 							style={{
 								backgroundColor: 'transparent',
 								borderWidth: 1,
-								flexDirection:"column",
+								flexDirection: 'column',
 								color: 'black',
 								position: 'absolute',
 								bottom: 75,
@@ -250,11 +187,11 @@ const ChatInput = () => {
 							/>
 						</View>
 					)}
-					
+
 					{fileUri && (
 						<View
 							style={{
-								borderColor:"black",
+								borderColor: 'black',
 								borderWidth: 1,
 								position: 'absolute',
 								bottom: 50,
@@ -263,12 +200,10 @@ const ChatInput = () => {
 								width: 200,
 							}}
 						>
-							 <Text>chọn file: {selectedFileName}</Text>
+							<Text>chọn file: {selectedFileName}</Text>
 						</View>
 					)}
-					<TouchableOpacity
-						onPress={pickFile}
-					>
+					<TouchableOpacity onPress={pickFile}>
 						<Feather name="paperclip" size={20} color="black" />
 					</TouchableOpacity>
 					<TouchableOpacity onPress={pickImage}>

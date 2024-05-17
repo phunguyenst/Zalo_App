@@ -2,7 +2,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import React from 'react';
 
-const Message = ({ message, onPress }) => {
+const Message = ({ message, sender, onPress }) => {
+	const handleFileDownload = (fileUrl) => {
+		alert('Không thể download được file này');
+	};
 	return (
 		<View
 			style={[
@@ -36,14 +39,25 @@ const Message = ({ message, onPress }) => {
 						Tin nhắn đã bị thu hồi
 					</Text>
 				) : message.type === 'image' ? (
-					<Image
-						source={{ uri: message.content }}
-						style={{ width: 200, height: 200 }}
-					/>
+					<View>
+						<Image
+							source={{ uri: message.content }}
+							style={{ width: 100, height: 100 }}
+						/>
+					</View>
 				) : message.type === 'notification' ? (
 					<Text style={styles.notificationText}>
 						{`${message.senderFullName} ${message.content}`}
 					</Text>
+				) : message.type === 'file' ? (
+					<TouchableOpacity
+						style={styles.downloadButton}
+						onPress={() => handleFileDownload(message.content)}
+					>
+						<Text style={styles.downloadButtonText}>
+							{message.content}
+						</Text>
+					</TouchableOpacity>
 				) : (
 					<Text
 						style={{
@@ -55,6 +69,21 @@ const Message = ({ message, onPress }) => {
 					</Text>
 				)}
 			</View>
+
+			{message.type !== 'notification' && !message.isRecalled && (
+				<Image
+					source={{
+						uri: sender.profilePic,
+					}}
+					style={{
+						height: 20,
+						width: 20,
+						borderRadius: 20,
+						backgroundColor: 'white',
+						margin: 10,
+					}}
+				/>
+			)}
 		</View>
 	);
 };
@@ -63,7 +92,7 @@ export default Message;
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		flex: 1 + ' !important',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-end',
@@ -104,5 +133,16 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ddd',
 		borderRadius: 20,
 		paddingHorizontal: 10,
+	},
+	downloadButton: {
+		padding: 10,
+		backgroundColor: '#0066cc',
+		borderRadius: 5,
+		alignItems: 'center',
+		overflow: 'hidden',
+	},
+	downloadButtonText: {
+		color: 'white',
+		fontSize: 16,
 	},
 });
