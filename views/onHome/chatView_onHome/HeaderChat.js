@@ -26,7 +26,7 @@ const HeaderChat = ({ navigation }) => {
 			}}
 		>
 			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<TouchableOpacity onPress={() => navigation.goBack()}>
+				<TouchableOpacity onPress={() => navigation.navigate("Home")}>
 					<AntDesign name="arrowleft" size={24} color="white" />
 				</TouchableOpacity>
 				<Image

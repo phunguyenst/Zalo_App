@@ -35,7 +35,11 @@ const ChatDetail = ({ navigation }) => {
 		};
 
 		fetchData();
-	}, [conversationDetails?.conversationId, profile.userID, dispatch]);
+
+        const unsubscribe = navigation.addListener('focus', fetchData);
+
+        return unsubscribe;
+    }, [conversationDetails?.conversationId, profile.userID, dispatch, navigation]);
 
 	useEffect(() => {
 		if (socket) {

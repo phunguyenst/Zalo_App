@@ -31,6 +31,7 @@ const AccountView = () => {
 	const [showModalForgetPassword, setShowModalForgetPassword] =
 		useState(false);
 	const [userData, setUserData] = useState(null);
+	
 	// const [phoneForget, setPhoneForget] = useState('');
 	useEffect(() => {
 		const fetchInfo = async () => {
@@ -44,7 +45,13 @@ const AccountView = () => {
 			}
 		};
 		fetchInfo();
-	}, []);
+		const unsubscribe = navigation.addListener('focus', () => {
+			
+			fetchInfo();
+		});
+	
+		return unsubscribe;
+	}, [dispatch, navigation]);
 	let phoneNumber = userData?.phoneNumber;
 	const hideDialog = () => setShowModalForgetPassword(false);
 	const showToast = (message) => {
@@ -103,7 +110,7 @@ const AccountView = () => {
 							navigation.navigate('infoScreen');
 						}}
 					>
-						<Card>
+						<Card style={{ backgroundColor: '#FFFFFF', color: "black" }}>
 							<Card.Content>
 								<View
 									style={{
@@ -120,6 +127,7 @@ const AccountView = () => {
 										<Card.Title
 											title={userData.fullName}
 											subtitleStyle={{ fontSize: 15 }}
+											titleStyle={{ color: 'black', fontSize: "bold" }} 
 										/>
 									</View>
 								</View>
@@ -152,26 +160,7 @@ const AccountView = () => {
 					</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={{ flex: 0.05 }}></View>
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: '#FFFFFF',
-					justifyContent: 'center',
-					paddingLeft: '5%',
-				}}
-			>
-				<Text
-					style={{
-						fontSize: 14,
-						fontWeight: 'bold',
-						fontFamily: 'Roboto',
-					}}
-				>
-					Đổi ảnh đại diện
-				</Text>
-			</View>
-			<View style={{ flex: 0.1 }}></View>
+
 			<TouchableOpacity
 				onPress={openChangePasswordModal}
 				style={{
@@ -192,7 +181,7 @@ const AccountView = () => {
 				</Text>
 			</TouchableOpacity>
 			<View style={{ flex: 0.1 }}></View>
-			<View
+			<TouchableOpacity
 				style={{
 					flex: 1,
 					backgroundColor: '#FFFFFF',
@@ -209,7 +198,7 @@ const AccountView = () => {
 				>
 					Cập nhật giới thiệu bản thân
 				</Text>
-			</View>
+			</TouchableOpacity>
 			<View style={{ flex: 0.05 }}></View>
 			<View
 				style={{
