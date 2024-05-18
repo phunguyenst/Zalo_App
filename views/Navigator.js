@@ -44,7 +44,7 @@ const Navigator = () => {
 					dispatch(setIsLogin(true));
 					navigation.navigate('Home');
 				} else {
-					navigation.navigate('Login');
+					navigation.navigate('Welcome');
 				}
 			} catch (error) {
 				console.error('Lỗi khi kiểm tra token:', error);
@@ -67,14 +67,14 @@ const Navigator = () => {
 				<PersistGate loading={null} persistor={persistor}>
 					<Stack.Navigator>
 						<Stack.Screen
-							name="Login"
-							component={Login}
-							options={{ title: 'Đăng nhập' }}
-						/>
-						<Stack.Screen
 							name="Welcome"
 							component={Welcome}
 							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Login"
+							component={Login}
+							options={{ title: 'Đăng nhập' }}
 						/>
 						<Stack.Screen
 							name="Verifier"

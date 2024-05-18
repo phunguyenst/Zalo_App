@@ -7,10 +7,10 @@ const userApi = {
 	},
 	changePassword: async (newPassword, phoneNumber) => {
 		const url = '/user/change-password';
-
+	
 		const data = {
 			newPassword: newPassword,
-			phoneNumber: phoneNumber,
+			phoneNumber: phoneNumber
 		};
 		return axiosClient.put(url, data);
 	},

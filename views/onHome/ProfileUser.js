@@ -9,28 +9,30 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import infoScreen from './profileUser_onHome/InfomationDetai';
-import { Avatar, Badge, Card, Divider, Button } from 'react-native-paper';
+import { Avatar, Badge, Card, Divider,  Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { readProfile, clearProfile } from '../slide/ProfileSlide';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { selectAuthorization } from '../slide/LoginSlide';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistor } from '../store';
 import authApi from '../../api/authApi';
+import userApi from '../../api/userApi';
+import Toast from 'react-native-root-toast';
+
+
 const AccountView = () => {
 	let navigation = useNavigation();
 	const dispatch = useDispatch();
 	const profile = useSelector((state) => state.profile);
 	const authorization = useSelector(selectAuthorization);
-
+	
+	const [newPassword, setNewPassword] = useState('');
+	const [showModalForgetPassword, setShowModalForgetPassword] =
+		useState(false);
 	const [userData, setUserData] = useState(null);
-
-	const logout = () => {
-		dispatch(clearProfile());
-		persistor.purge().then(() => {
-			navigation.navigate('Welcome');
-		});
-	};
+	
+	// const [phoneForget, setPhoneForget] = useState('');
 	useEffect(() => {
 		const fetchInfo = async () => {
 			try {
@@ -43,9 +45,63 @@ const AccountView = () => {
 			}
 		};
 		fetchInfo();
-	}, []);
+		const unsubscribe = navigation.addListener('focus', () => {
+			
+			fetchInfo();
+		});
+	
+		return unsubscribe;
+	}, [dispatch, navigation]);
+	let phoneNumber = userData?.phoneNumber;
+	const hideDialog = () => setShowModalForgetPassword(false);
+	const showToast = (message) => {
+        Toast.show(message, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+        });
+    };
+	const openChangePasswordModal = () => {
+		setShowModalForgetPassword(true);
+	};
+	
+	const closeChangePasswordModal = () => {
+		sendChangePasswordRequest(newPassword, phoneNumber);
+	};
+	const sendChangePasswordRequest = async (newPassword, phoneNumber) => {
+        console.log('newPassword:', newPassword);
+        console.log('phoneN:', phoneNumber);
+        try {
+            const res = await userApi.changePassword(newPassword, phoneNumber);
+            console.log("res", res);
+          
+            setShowModalForgetPassword(false);
+            showToast('Cập nhật mật khẩu thành công');
+			console.log('Đổi mật khẩu thành công:', res);
+
+    } catch (error) {
+      
+        console.error('Đổi mật khẩu không thành công:', error);
+        setShowModalForgetPassword(false);
+        showToast('Đổi mật khẩu không thành công');
+    }
+    };
+	const logout =async () => {
+		await dispatch(clearProfile());
+		await AsyncStorage.clear();
+		
+		persistor.purge().then(() => {
+			navigation.navigate('Welcome');
+		});
+	};
+	
+
 
 	return (
+		<PaperProvider>
 		<View style={styles.container}>
 			{userData && (
 				<>
@@ -54,7 +110,7 @@ const AccountView = () => {
 							navigation.navigate('infoScreen');
 						}}
 					>
-						<Card>
+						<Card style={{ backgroundColor: '#FFFFFF', color: "black" }}>
 							<Card.Content>
 								<View
 									style={{
@@ -71,13 +127,14 @@ const AccountView = () => {
 										<Card.Title
 											title={userData.fullName}
 											subtitleStyle={{ fontSize: 15 }}
+											titleStyle={{ color: 'black', fontSize: "bold" }} 
 										/>
 									</View>
 								</View>
 							</Card.Content>
 						</Card>
 					</TouchableOpacity>
-					{/* ... other code */}
+				
 				</>
 			)}
 
@@ -103,8 +160,9 @@ const AccountView = () => {
 					</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={{ flex: 0.05 }}></View>
-			<View
+
+			<TouchableOpacity
+				onPress={openChangePasswordModal}
 				style={{
 					flex: 1,
 					backgroundColor: '#FFFFFF',
@@ -119,30 +177,11 @@ const AccountView = () => {
 						fontFamily: 'Roboto',
 					}}
 				>
-					Đổi ảnh đại diện
+					Đổi mật khẩu
 				</Text>
-			</View>
-			<View style={{ flex: 0.05 }}></View>
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: '#FFFFFF',
-					justifyContent: 'center',
-					paddingLeft: '5%',
-				}}
-			>
-				<Text
-					style={{
-						fontSize: 14,
-						fontWeight: 'bold',
-						fontFamily: 'Roboto',
-					}}
-				>
-					Đổi ảnh bìa
-				</Text>
-			</View>
-			<View style={{ flex: 0.05 }}></View>
-			<View
+			</TouchableOpacity>
+			<View style={{ flex: 0.1 }}></View>
+			<TouchableOpacity
 				style={{
 					flex: 1,
 					backgroundColor: '#FFFFFF',
@@ -159,7 +198,7 @@ const AccountView = () => {
 				>
 					Cập nhật giới thiệu bản thân
 				</Text>
-			</View>
+			</TouchableOpacity>
 			<View style={{ flex: 0.05 }}></View>
 			<View
 				style={{
@@ -281,7 +320,62 @@ const AccountView = () => {
 				</TouchableOpacity>
 			</View>
 			<View style={{ flex: 5.05, backgroundColor: '#FFFFFF' }}></View>
+			<Portal>
+                    <Dialog
+                        visible={showModalForgetPassword}
+                        onDismiss={hideDialog}
+                        style={{ backgroundColor: 'white' }}
+                    >
+                        <Dialog.Title style={{ color: 'black' }}>
+                            Quên mật khẩu
+                        </Dialog.Title>
+                        <Dialog.Content>
+                            <View>
+                                <TextInput
+                                    placeholder="Số điện thoại"
+									defaultValue={phoneNumber} 
+								
+									
+                                    onChangeText={(text) =>
+                                        setPhoneForget(text)
+                                    }
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: 'black',
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 5,
+                                        borderRadius: 5,
+                                        marginVertical: 10,
+                                    }}
+                                />
+                                <TextInput
+                                    placeholder="Nhập mật khẩu mới"
+                                    value={newPassword}
+                                    onChangeText={(text) =>
+                                        setNewPassword(text)
+                                    }
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: 'black',
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 5,
+                                        borderRadius: 5,
+                                    }}
+                                />
+                            </View>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={hideDialog} textColor="black">
+                                Hủy
+                            </Button>
+                            <Button onPress={closeChangePasswordModal} textColor="black">
+                                Cập nhật mật khẩu
+                            </Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
 		</View>
+		</PaperProvider>
 	);
 };
 
