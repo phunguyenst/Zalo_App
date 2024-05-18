@@ -12,6 +12,7 @@ const ProfileSlide = createSlice({
 	reducers: {
 		readProfile: (state, action) => {
 			state.profile = action.payload;
+			console.log('profile:', state.profile);
 		},
 		clearProfile: (state) => {
 			state.profile = null;

@@ -12,14 +12,15 @@ import { setAuthorization, setIsLogin } from '../views/slide/LoginSlide';
 import { useDispatch, useSelector } from 'react-redux';
 import firebaseConfig from '../config';
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
-
+import Toast from 'react-native-root-toast';
+import otpApi from '../api/otpApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
 
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
-	const [phone, setPhone] = useState('+84812580727');
-	const [password, setPassword] = useState('12345678');
+	const [phone, setPhone] = useState('+84338630727');
+	const [password, setPassword] = useState('');
 	const [loginError, setLoginError] = useState(false);
 	const [loginErrorMessage, setLoginErrorMessage] = useState('');
 	const [verificationId, setVerificationId] = useState(null);
@@ -30,20 +31,15 @@ const Login = ({ navigation }) => {
 	const [phoneForget, setPhoneForget] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 	//ref cho recaptcha
-	const recaptchaVerifier = useRef(null);
-	const sendVerification = async () => {
-		try {
-			const phoneProvider = new firebaseConfig.auth.PhoneAuthProvider();
-			const verificationId = await phoneProvider.verifyPhoneNumber(
-				phone,
-				recaptchaVerifier.current
-			);
-			setVerificationId(verificationId);
-			setPhone('');
-			navigation.navigate('Verifier', { verificationId: verificationId });
-		} catch (error) {
-			console.error('Error sending verification:', error);
-		}
+	const showToast = (message) => {
+		Toast.show(message, {
+			duration: Toast.durations.LONG,
+			position: Toast.positions.BOTTOM,
+			shadow: true,
+			animation: true,
+			hideOnPress: true,
+			delay: 0,
+		});
 	};
 
 	const handleLogin = async () => {
@@ -85,6 +81,17 @@ const Login = ({ navigation }) => {
 	};
 	const hideDialog = () => setShowModalForgetPassword(false);
 
+	const sendVerification = async () => {
+		try {
+			console.log("Phone", phone);
+			await otpApi.sendOTP(phone.toString());
+			showToast('Gửi OTP thành công');
+			navigation.navigate('Verifier', { phone, password });
+		} catch (error) {
+			console.error('Error sending verification:', error);
+			showToast('Gửi OTP không thành công');
+		}
+	};
 	const sendChangePasswordRequest = async (newPassword, phoneN) => {
 		try {
 			const res = await fetch('localhost:5000/api/user/change-password', {
@@ -107,6 +114,7 @@ const Login = ({ navigation }) => {
 			setShowModalForgetPassword(false);
 		}
 	};
+	
 
 	return (
 		<PaperProvider>
@@ -216,7 +224,14 @@ const Login = ({ navigation }) => {
 						</View>
 					</View>
 				</View>
-				<TouchableOpacity onPress={showDialog}>
+				{/* <TouchableOpacity onPress={showDialog}>
+					<View style={{ marginTop: 30, flex: 1 }}>
+						<Text styles={{ textAlign: 'center', color: 'blue' }}>
+							Quên mật khẩu?
+						</Text>
+					</View>
+				</TouchableOpacity> */}
+				<TouchableOpacity onPress={sendVerification}>
 					<View style={{ marginTop: 30, flex: 1 }}>
 						<Text styles={{ textAlign: 'center', color: 'blue' }}>
 							Quên mật khẩu?
