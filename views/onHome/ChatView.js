@@ -36,7 +36,6 @@ const ChatView = ({ navigation, route }) => {
 
 		fetchConversations();
 	}, [dispatch]);
-
 	return (
 		<View style={{ flex: 1, backgroundColor: 'white' }}>
 			<ScrollView nestedScrollEnabled>
@@ -59,7 +58,7 @@ const ChatView = ({ navigation, route }) => {
 													? item.avatar
 													: item.membersInfo?.find(
 															(member) =>
-																member.userID !==
+																member?.userID !==
 																profile?.userID
 													  )?.profilePic,
 										}}
@@ -72,7 +71,7 @@ const ChatView = ({ navigation, route }) => {
 													? item.name
 													: item.membersInfo?.find(
 															(member) =>
-																member.userID !==
+																member?.userID !==
 																profile?.userID
 													  )?.fullName
 											}
