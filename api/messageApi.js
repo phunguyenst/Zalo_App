@@ -8,14 +8,6 @@ const messageApi = {
 				'content-type': 'multipart/form-data',
 			},
 		};
-		// let formData = new FormData();
-		// formData.append('conversationId', data.conversationId);
-		// if (data.type === 'image') {
-        //     formData.append('content', data.content, 'image.png');
-        // } else {
-        //     formData.append('content', data.content);
-        // }
-		// formData.append('type', data.type);
 		return axiosClient.post(url, data, config);
 	},
 	getMessages: (conversationId) => {

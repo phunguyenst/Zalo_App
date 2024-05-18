@@ -23,6 +23,9 @@ const MessagesList = () => {
 	const scrollViewRef = useRef();
 	const dispatch = useDispatch();
 	const messages = useSelector((state) => state.message.messages);
+	const conversationDetails = useSelector(
+		(state) => state.conservation.conversationDetails
+	);
 	const profile = useSelector((state) => state.profile.profile);
 
 	const [isModalVisible, setModalVisible] = useState(false);
@@ -121,6 +124,9 @@ const MessagesList = () => {
 							key={message.messageId}
 							message={message}
 							onPress={() => handlePressMessage(message)}
+							sender={conversationDetails.membersInfo.find(
+								(member) => member.userID === message.senderId
+							)}
 						/>
 					))}
 			</ScrollView>
