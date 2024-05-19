@@ -6,6 +6,7 @@ import {
 	TouchableOpacity,
 	Dimensions,
 	Image,
+	Button
 } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { AntDesign } from '@expo/vector-icons';
@@ -14,6 +15,7 @@ import { useForm, Controller } from 'react-hook-form';
 import Toast from 'react-native-root-toast';
 import authApi from '../api/authApi';
 import otpApi from '../api/otpApi';
+import Modal from 'react-native-modal';
 const screenWidth = Dimensions.get('window').width;
 
 const SignUp = ({ navigation }) => {
@@ -21,18 +23,17 @@ const SignUp = ({ navigation }) => {
 	const [signupErrorMessage, setSignUpErrorMessage] = useState('');
 	const [isPasswordVisible, setPasswordVisible] = useState(false);
 
-	const recaptchaVerifier = useRef(null);
+const [isModalVisible, setModalVisible] = useState(false);
+const [modalMessage, setModalMessage] = useState('');
 
-	const showToast = (message) => {
-		Toast.show(message, {
-			duration: Toast.durations.LONG,
-			position: Toast.positions.BOTTOM,
-			shadow: true,
-			animation: true,
-			hideOnPress: true,
-			delay: 0,
-		});
-	};
+const showToast = (message) => {
+  setModalMessage(message);
+  setModalVisible(true);
+};
+
+const hideModal = () => {
+  setModalVisible(false);
+};
 
 	const sendVerification = async (phone, password) => {
 		try {
@@ -202,6 +203,12 @@ const SignUp = ({ navigation }) => {
 					</TouchableOpacity>
 				</View>
 			</View>
+			<Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
+    <View style={{backgroundColor: 'white', padding: 20}}>
+      <Text>{modalMessage}</Text>
+      <Button title="Close" onPress={hideModal} />
+    </View>
+  </Modal>
 		</View>
 	);
 };

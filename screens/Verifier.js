@@ -4,6 +4,7 @@ import authApi from '../api/authApi';
 import otpApi from '../api/otpApi';
 import userApi from '../api/userApi';
 import { Button, Dialog, Portal, PaperProvider } from 'react-native-paper';
+import Modal from 'react-native-modal';
 import Toast from 'react-native-root-toast';
 const screenWidth = Dimensions.get('window').width;
 const Verifier = ({ navigation, route }) => {
@@ -14,16 +15,18 @@ const Verifier = ({ navigation, route }) => {
         useState(false);
     const [phoneForget, setPhoneForget] = useState(phone);
     const [newPassword, setNewPassword] = useState('');
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+    
     const showToast = (message) => {
-        Toast.show(message, {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: true,
-            animation: true,
-            hideOnPress: true,
-            delay: 0,
-        });
+      setModalMessage(message);
+      setModalVisible(true);
     };
+    
+    const hideModal = () => {
+      setModalVisible(false);
+    };
+    
 
     const handlerSentSMS = async () => {
         sendChangePasswordRequest(newPassword, phoneForget);
@@ -160,7 +163,12 @@ const Verifier = ({ navigation, route }) => {
                         </Dialog.Actions>
                     </Dialog>
                 </Portal>
-
+                <Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
+    <View style={{backgroundColor: 'white', padding: 20}}>
+      <Text>{modalMessage}</Text>
+      <Button title="Close" onPress={hideModal} />
+    </View>
+  </Modal>
             </View>
         </PaperProvider>
     );

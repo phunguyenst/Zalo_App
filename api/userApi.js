@@ -55,7 +55,12 @@ const userApi = {
 		const url = '/user/find-user-by-id/' + userId;
 		return axiosClient.get(url, { params: { userId } });
 	},
-
+	cancelRequestAddFriends: (userId, userRequestedId) => {
+		const data = {userId, userRequestedId};
+		console.log('data', data)
+		const url = '/user/cancel-request-add-friend';
+		return axiosClient.put(url, data);
+	},
 	cancelFriend: (userId, friendId) => {
 		const data = { userId, friendId };
 		const url = '/user/cancel-friend';

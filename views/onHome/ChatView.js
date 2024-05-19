@@ -35,7 +35,13 @@ const ChatView = ({ navigation, route }) => {
 		};
 
 		fetchConversations();
-	}, [dispatch]);
+		const unsubscribe = navigation.addListener('focus', () => {
+
+			fetchConversations();
+		});
+
+        return unsubscribe;
+	}, [dispatch, navigation]);
 
 	return (
 		<View style={{ flex: 1, backgroundColor: 'white' }}>
