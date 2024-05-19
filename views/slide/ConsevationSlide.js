@@ -15,11 +15,9 @@ const conservationSlide = createSlice({
 		},
 		setConversations: (state, action) => {
 			state.conversations = action.payload;
-			console.log('state: ', state.conversations);
 		},
 		setConversationDetails: (state, action) => {
 			state.conversationDetails = action.payload;
-			console.log('conversationDetails', action.payload);
 		},
 		updateConversationMembers: (state, action) => {
 			if (state.conversationDetails) {
