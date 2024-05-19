@@ -6,7 +6,7 @@ import {
 	StyleSheet,
 	Button,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalAddMember from './ModalAddMember';
 import conversationApi from '../../api/conversationApi';
@@ -17,6 +17,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import ModalListMember from './ModalListMember';
+import ModalDetailInfo from './ModalDetailInfo';
 
 const SettingGroup = () => {
 	const navigation = useNavigation();
@@ -25,58 +26,96 @@ const SettingGroup = () => {
 		(state) => state.conservation?.conversationDetails
 	);
 	const profile = useSelector((state) => state.profile?.profile);
-
 	const [modalVisible, setModalVisible] = useState(false);
 	const [listMemberModal, setListMemberModal] = useState(false);
+	const [detailMemberInfo, setDetailMemberInfo] = useState(false);
 	const [notiModal, setNotiModal] = useState(false);
 	const [notiMessage, setNotiMessage] = useState('');
-	const [role, setRole] = useState([]);
+	const [role, setRole] = useState(null); // Initialize as null
+	const [conversationPic, setConversationPic] = useState('');
+	const [other, setOther] = useState(null);
+	const [detail, setDetail] = useState('');
+	const [memberSelected, setMemberSelected] = useState(null);
 
 	useEffect(() => {
 		const roleUser = conversationDetails.participantIds.find(
 			(participant) => participant.participantId === profile.userID
 		);
-		setRole(roleUser);
-	});
+		if (roleUser !== role) {
+			setRole(roleUser);
+		}
+		
+	}, [conversationDetails, profile.userID, role]);
 
-	const closeModal = () => {
+	useEffect(() => {
+		if (conversationDetails.membersInfo.length === 2) {
+			let otherMember = conversationDetails.membersInfo.find(
+				(member) => member?.userID !== profile?.userID
+			);
+			if (otherMember !== other) {
+				setOther(otherMember);
+				setConversationPic(otherMember.profilePic);
+				setDetail(otherMember.fullName);
+			}
+		} else {
+			setConversationPic(conversationDetails.avatar);
+			setDetail(conversationDetails.name);
+		}
+	}, [conversationDetails, profile.userID, other]);
+
+	const closeModal = useCallback(() => {
 		setModalVisible(false);
-	};
-	const closeModalListMembers = () => {
+	}, []);
+
+	const closeModalListMembers = useCallback(() => {
 		setListMemberModal(false);
-	};
-	const showNoti = (message) => {
+	}, []);
+
+	const showNoti = useCallback((message) => {
 		setNotiMessage(message);
 		setNotiModal(true);
+	}, []);
+
+	const handlerConfirmAddMembers = useCallback(
+		async (checkedFriends) => {
+			try {
+				const res = await conversationApi.addMemberIntoGroup(
+					conversationDetails.conversationId,
+					checkedFriends
+				);
+				if (res) {
+					dispatch(
+						updateConversationMembers({
+							addedParticipantIds:
+								res.resData.addedParticipantIds,
+							membersInfo: res.resData.membersInfo,
+						})
+					);
+				}
+			} catch (error) {
+				console.error('Error when add member: ', error);
+			} finally {
+				setModalVisible(false);
+			}
+		},
+		[conversationDetails.conversationId, dispatch]
+	);
+
+	const handlerAddMember = useCallback(() => {
+		setModalVisible(true);
+	}, []);
+
+	const handlerShowDetailMemberModal = useCallback((member) => {
+		setMemberSelected(member);
+		setDetailMemberInfo(true);
+	}, []);
+
+	const handlerSelectMember = (member) => {
+		setMemberSelected(member);
+		setDetailMemberInfo(true);
 	};
 
-	const handlerConfirmAddMembers = async (checkedFriends) => {
-		try {
-			const res = await conversationApi.addMemberIntoGroup(
-				conversationDetails.conversationId,
-				checkedFriends
-			);
-			if (res) {
-				dispatch(
-					updateConversationMembers({
-						addedParticipantIds: res.resData.addedParticipantIds,
-						membersInfo: res.resData.membersInfo,
-					})
-				);
-			}
-		} catch (error) {
-			console.error('Error when add member: ', error);
-		} finally {
-			setModalVisible(false);
-		}
-	};
-	const handlerAddMember = () => {
-		setModalVisible(true);
-	};
-	const handlerShowListMember = () => {
-		setListMemberModal(true);
-	};
-	const handlerRemoveGroup = async () => {
+	const handlerRemoveGroup = useCallback(async () => {
 		try {
 			const res = await conversationApi.deleteConversation(
 				conversationDetails.conversationId
@@ -90,8 +129,9 @@ const SettingGroup = () => {
 		} catch (error) {
 			console.error('Error when delete group: ', error);
 		}
-	};
-	const handlerLeaveGroup = async () => {
+	}, [conversationDetails.conversationId, dispatch, navigation]);
+
+	const handlerLeaveGroup = useCallback(async () => {
 		if (conversationDetails.participantIds.length === 3) {
 			showNoti('Số thành viên tối thiểu phải là 3 người');
 			return;
@@ -120,46 +160,72 @@ const SettingGroup = () => {
 		} catch (error) {
 			console.error('Error when leave group: ', error);
 		}
-	};
+	}, [
+		conversationDetails.participantIds,
+		conversationDetails.conversationId,
+		role,
+		profile.userID,
+		showNoti,
+		navigation,
+	]);
+
+	const handlerShowListMember = useCallback(() => {
+		setListMemberModal(true);
+	}, []);
+
+	const closeModalDetailMember = useCallback(() => {
+		setDetailMemberInfo(false);
+	}, []);
 
 	return (
 		<View style={styles.container}>
-			<Image
-				source={{ uri: conversationDetails.avatar }}
-				style={styles.avatar}
-			/>
-			<Text style={styles.groupName}>{conversationDetails.name}</Text>
-			<Text style={styles.memberCount}>
-				Members: {conversationDetails.participantIds.length}
-			</Text>
-			<View style={styles.option}>
-				<TouchableOpacity
-					style={styles.optionItem}
-					onPress={handlerAddMember}
-				>
-					<Text>Thêm thành viên</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.optionItem}
-					onPress={handlerShowListMember}
-				>
-					<Text>Danh sách thành viên</Text>
-				</TouchableOpacity>
-				{role.role === 'owner' && (
+			<Image source={{ uri: conversationPic }} style={styles.avatar} />
+			<Text style={styles.groupName}>{detail}</Text>
+			{conversationDetails.participantIds.length > 2 && (
+				<Text style={styles.memberCount}>
+					Số thành Viên {conversationDetails.participantIds.length}
+				</Text>
+			)}
+			{conversationDetails.participantIds.length > 2 ? (
+				<View style={styles.option}>
 					<TouchableOpacity
 						style={styles.optionItem}
-						onPress={handlerRemoveGroup}
+						onPress={handlerAddMember}
 					>
-						<Text style={{ color: 'red' }}>Giải tán nhóm</Text>
+						<Text>Thêm thành viên</Text>
 					</TouchableOpacity>
-				)}
-				<TouchableOpacity
-					style={styles.optionItem}
-					onPress={handlerLeaveGroup}
-				>
-					<Text style={{ color: 'red' }}>Rời khỏi nhóm</Text>
-				</TouchableOpacity>
-			</View>
+					<TouchableOpacity
+						style={styles.optionItem}
+						onPress={handlerShowListMember}
+					>
+						<Text>Danh sách thành viên</Text>
+					</TouchableOpacity>
+					{role?.role === 'owner' && (
+						<TouchableOpacity
+							style={styles.optionItem}
+							onPress={handlerRemoveGroup}
+						>
+							<Text style={{ color: 'red' }}>Giải tán nhóm</Text>
+						</TouchableOpacity>
+					)}
+					<TouchableOpacity
+						style={styles.optionItem}
+						onPress={handlerLeaveGroup}
+					>
+						<Text style={{ color: 'red' }}>Rời khỏi nhóm</Text>
+					</TouchableOpacity>
+				</View>
+			) : (
+				<View style={styles.option}>
+					<TouchableOpacity
+						style={styles.optionItem}
+						onPress={() => handlerShowDetailMemberModal(other)}
+					>
+						<Text>Thông tin cá nhân</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+
 			<ModalAddMember
 				isVisible={modalVisible}
 				onClose={closeModal}
@@ -168,6 +234,12 @@ const SettingGroup = () => {
 			<ModalListMember
 				isVisible={listMemberModal}
 				onClose={closeModalListMembers}
+				onClickMember={handlerSelectMember}
+			/>
+			<ModalDetailInfo
+				isVisible={detailMemberInfo}
+				onClose={closeModalDetailMember}
+				infoMember={memberSelected}
 			/>
 
 			<Modal

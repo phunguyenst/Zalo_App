@@ -7,21 +7,46 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Modal,
-	Alert,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import conversationApi from '../../api/conversationApi';
+import { setConversationDetails } from '../slide/ConsevationSlide';
 
-const ModalListMember = ({ isVisible, onClose, onConfirm }) => {
+const ModalListMember = ({ isVisible, onClose, onClickMember }) => {
+	const dispatch = useDispatch();
+
 	const conversationDetails = useSelector(
 		(state) => state.conservation?.conversationDetails
 	);
 	const [confirmVisible, setConfirmVisible] = useState(false);
+	const [optionsVisible, setOptionsVisible] = useState(false);
 	const [selectedMember, setSelectedMember] = useState(null);
 
 	const handleMemberPress = (member) => {
 		setSelectedMember(member);
-		setConfirmVisible(true);
+		setOptionsVisible(true);
+	};
+
+	const handleViewDetails = () => {
+		onClickMember(selectedMember);
+		setOptionsVisible(false);
+	};
+
+	const handleSetLeader = async () => {
+		try {
+			const res = await conversationApi.chanceRoleOwner(
+				conversationDetails.conversationId,
+				selectedMember.userID
+			);
+			if (res && res.resData) {
+				dispatch(setConversationDetails(res.resData));
+				console.log('Set leader response: ', res);
+			}
+		} catch (error) {
+			console.error('Error setting leader: ', error);
+		} finally {
+			setOptionsVisible(false);
+		}
 	};
 
 	const handleRemoveMember = async () => {
@@ -31,12 +56,13 @@ const ModalListMember = ({ isVisible, onClose, onConfirm }) => {
 				selectedMember.userID
 			);
 			if (res) {
-				console.log('res: ', res);
+				console.log('Remove member response: ', res);
 			}
 		} catch (error) {
-			console.error('error when remove member: ', error);
+			console.error('Error removing member: ', error);
 		} finally {
 			setConfirmVisible(false);
+			setOptionsVisible(false);
 		}
 	};
 
@@ -79,7 +105,45 @@ const ModalListMember = ({ isVisible, onClose, onConfirm }) => {
 					<Text>Đóng</Text>
 				</TouchableOpacity>
 			</View>
-			{/* Confirmation Modal */}
+			{/* Options Modal */}
+			<Modal
+				visible={optionsVisible}
+				transparent={true}
+				animationType="fade"
+				onRequestClose={() => setOptionsVisible(false)}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.optionsModal}>
+						<TouchableOpacity
+							style={styles.optionButton}
+							onPress={handleViewDetails}
+						>
+							<Text>Xem chi tiết</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={styles.optionButton}
+							onPress={handleSetLeader}
+						>
+							<Text>Chỉ định làm nhóm trưởng</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={styles.optionButton}
+							onPress={() => {
+								setOptionsVisible(false);
+								setConfirmVisible(true);
+							}}
+						>
+							<Text>Xóa</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={styles.optionButton}
+							onPress={() => setOptionsVisible(false)}
+						>
+							<Text>Hủy</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 			<Modal
 				visible={confirmVisible}
 				transparent={true}
@@ -143,13 +207,37 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontSize: 18,
 	},
-	// Additional styles for confirmation modal
+	// Additional styles for options modal
 	centeredView: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
+	optionsModal: {
+		backgroundColor: 'white',
+		padding: 20,
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+		width: '80%',
+		borderRadius: 10,
+	},
+	optionButton: {
+		padding: 10,
+		marginVertical: 5,
+		backgroundColor: '#ddd',
+		borderRadius: 5,
+		width: '100%',
+		alignItems: 'center',
+	},
+	// Additional styles for confirmation modal
 	confirmationModal: {
 		backgroundColor: 'white',
 		padding: 20,
@@ -163,6 +251,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 3.84,
 		elevation: 5,
 		width: '80%',
+		borderRadius: 10,
 	},
 	confirmationText: {
 		fontSize: 16,
