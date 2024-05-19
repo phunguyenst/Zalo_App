@@ -33,6 +33,54 @@ const ContactView = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const profile = useSelector((state) => state.profile.profile);
 
+
+	
+	useEffect(() => {
+		const fetchUserInfos = async () => {
+			try {
+				const response = await userApi.inFoUser(profile?.userID);
+				const userData = response?.user;
+				dispatch(setProfile({ profile: userData }));
+				dispatch(
+					setListRequestAddFriendsSent({
+						listRequestAddFriendsSent:
+							userData.listRequestAddFriendsSent,
+					})
+				);
+				dispatch(
+					setListRequestAddFriendsReceived({
+						listRequestAddFriendsReceived:
+							userData.listRequestAddFriendsReceived,
+					})
+				);
+				const friendProfiles = await Promise.all(
+					userData.friends.map((id) => userApi.findUserById(id))
+				);
+				dispatch(setFriends({ friends: friendProfiles }));
+				setFriendProfiles(friendProfiles);
+				const sentRequests = await Promise.all(
+					userData.listRequestAddFriendsSent.map((id) =>
+						userApi.findUserById(id)
+					)
+				);
+				dispatch(setSentRequests(sentRequests));
+				const receivedRequests = await Promise.all(
+					userData.listRequestAddFriendsReceived.map((id) =>
+						userApi.findUserById(id)
+					)
+				);
+				dispatch(setReceivedRequests(receivedRequests));
+			} catch (error) {
+				console.log('fetchUserInfo:', error);
+			}
+		};
+		fetchUserInfos();
+		const unsubscribe = navigation.addListener('focus', () => {
+			fetchUserInfos();
+		});
+
+		return unsubscribe;
+	}, [dispatch, navigation]);
 	const handleDeleteFriend = async (friendId) => {
 		try {
 			const response = await userApi.deleteFriend(
@@ -44,48 +92,6 @@ const ContactView = ({ navigation }) => {
 			console.log('Error when delete friend:', error);
 		}
 	};
-	const fetchUserInfos = async () => {
-		try {
-			const response = await userApi.inFoUser(profile?.userID);
-			const userData = response?.user;
-			dispatch(setProfile({ profile: userData }));
-			dispatch(
-				setListRequestAddFriendsSent({
-					listRequestAddFriendsSent:
-						userData.listRequestAddFriendsSent,
-				})
-			);
-			dispatch(
-				setListRequestAddFriendsReceived({
-					listRequestAddFriendsReceived:
-						userData.listRequestAddFriendsReceived,
-				})
-			);
-			const friendProfiles = await Promise.all(
-				userData.friends.map((id) => userApi.findUserById(id))
-			);
-			dispatch(setFriends({ friends: friendProfiles }));
-			setFriendProfiles(friendProfiles);
-			const sentRequests = await Promise.all(
-				userData.listRequestAddFriendsSent.map((id) =>
-					userApi.findUserById(id)
-				)
-			);
-			dispatch(setSentRequests(sentRequests));
-			const receivedRequests = await Promise.all(
-				userData.listRequestAddFriendsReceived.map((id) =>
-					userApi.findUserById(id)
-				)
-			);
-			dispatch(setReceivedRequests(receivedRequests));
-		} catch (error) {
-			console.log('fetchUserInfo:', error);
-		}
-	};
-	useEffect(() => {
-		fetchUserInfos();
-	}, []);
-
 	return (
 		<ScrollView nestedScrollEnabled>
 			<View style={styles.container}>

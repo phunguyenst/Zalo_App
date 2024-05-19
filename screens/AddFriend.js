@@ -17,6 +17,7 @@ import axios from 'axios';
 import userApi from '../api/userApi';
 import { useDispatch, useSelector } from 'react-redux';
 import Toast from 'react-native-root-toast';
+
 // import { addFriend } from '../views/slide';
 const AddFriendScreen = () => {
 	const navigation = useNavigation();

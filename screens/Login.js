@@ -16,6 +16,7 @@ import Toast from 'react-native-root-toast';
 import otpApi from '../api/otpApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
+import Modal from 'react-native-modal';
 
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
@@ -30,17 +31,18 @@ const Login = ({ navigation }) => {
 		useState(false);
 	const [phoneForget, setPhoneForget] = useState('');
 	const [newPassword, setNewPassword] = useState('');
-	//ref cho recaptcha
-	const showToast = (message) => {
-		Toast.show(message, {
-			duration: Toast.durations.LONG,
-			position: Toast.positions.BOTTOM,
-			shadow: true,
-			animation: true,
-			hideOnPress: true,
-			delay: 0,
-		});
-	};
+
+	const [isModalVisible, setModalVisible] = useState(false);
+const [modalMessage, setModalMessage] = useState('');
+
+const showToast = (message) => {
+  setModalMessage(message);
+  setModalVisible(true);
+};
+
+const hideModal = () => {
+  setModalVisible(false);
+};
 
 	const handleLogin = async () => {
 		try {
@@ -312,6 +314,12 @@ const Login = ({ navigation }) => {
 						</Dialog.Actions>
 					</Dialog>
 				</Portal>
+				<Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
+    <View style={{backgroundColor: 'white', padding: 20}}>
+      <Text>{modalMessage}</Text>
+      <Button title="Close" onPress={hideModal} />
+    </View>
+  </Modal>
 			</View>
 		</PaperProvider>
 	);
