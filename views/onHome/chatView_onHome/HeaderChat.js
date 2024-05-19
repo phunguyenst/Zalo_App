@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -9,11 +9,14 @@ const HeaderChat = ({ navigation }) => {
 	const conversationDetails = useSelector(
 		(state) => state.conservation.conversationDetails
 	);
+	const [participantCount, setParticipantCount] = useState(conversationDetails.participantIds.length);
 	const profile = useSelector((state) => state.profile.profile);
 	const handlerSetting = () => {
 		navigation.navigate('Setting');
 	};
-
+	useEffect(() => {
+		setParticipantCount(conversationDetails.participantIds.length);
+	}, [conversationDetails.participantIds.length]);
 	return (
 		<LinearGradient
 			colors={['#247bfe', '#139afc', '#02b9fa']}
@@ -35,9 +38,9 @@ const HeaderChat = ({ navigation }) => {
 							conversationDetails?.participantIds.length > 2
 								? conversationDetails.avatar
 								: conversationDetails?.membersInfo?.find(
-										(member) =>
-											member.userID !== profile?.userID
-								  )?.profilePic,
+									(member) =>
+										member.userID !== profile?.userID
+								)?.profilePic,
 					}}
 					style={{
 						height: 40,
@@ -53,14 +56,13 @@ const HeaderChat = ({ navigation }) => {
 						{conversationDetails?.participantIds.length > 2
 							? conversationDetails.name
 							: conversationDetails?.membersInfo?.find(
-									(member) =>
-										member.userID !== profile?.userID
-							  )?.fullName}
+								(member) =>
+									member.userID !== profile?.userID
+							)?.fullName}
 					</Text>
-					{conversationDetails.participantIds.length > 2 && (
+					{participantCount > 2 && (
 						<View>
-							{conversationDetails.participantIds.length} thành
-							viên
+							{participantCount} thành viên
 						</View>
 					)}
 				</View>

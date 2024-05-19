@@ -44,6 +44,7 @@ const SettingGroup = () => {
 		if (roleUser !== role) {
 			setRole(roleUser);
 		}
+		
 	}, [conversationDetails, profile.userID, role]);
 
 	useEffect(() => {

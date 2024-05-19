@@ -6,18 +6,23 @@ const Message = ({ message, sender, onPress }) => {
 	const handleFileDownload = (fileUrl) => {
 		alert('Không thể download được file này');
 	};
+
+	const isNotification = message.type === 'notification';
+	const isRecalled = message.isRecalled;
+	const isMyMessage = message.isMyMessage;
+
 	return (
 		<View
 			style={[
 				styles.container,
-				message.type === 'notification'
+				isNotification
 					? styles.centeredContainer
-					: message.isMyMessage
+					: isMyMessage
 					? {}
 					: styles.rowReverse,
 			]}
 		>
-			{message.type !== 'notification' && !message.isRecalled && (
+			{!isNotification && !isRecalled && (
 				<TouchableOpacity onPress={() => onPress(message)}>
 					<Entypo name="dots-three-vertical" size={20} color="gray" />
 				</TouchableOpacity>
@@ -26,18 +31,12 @@ const Message = ({ message, sender, onPress }) => {
 			<View
 				style={[
 					styles.messageContainer,
-					message.isMyMessage
-						? styles.myMessage
-						: styles.otherMessage,
-					message.type === 'notification'
-						? styles.notificationMessage
-						: {},
+					isMyMessage ? styles.myMessage : styles.otherMessage,
+					isNotification ? styles.notificationMessage : {},
 				]}
 			>
-				{message.isRecalled ? (
-					<Text style={styles.recalledMessage}>
-						Tin nhắn đã bị thu hồi
-					</Text>
+				{isRecalled ? (
+					<Text style={styles.recalledMessage}>Tin nhắn đã bị thu hồi</Text>
 				) : message.type === 'image' ? (
 					<View>
 						<Image
@@ -54,15 +53,13 @@ const Message = ({ message, sender, onPress }) => {
 						style={styles.downloadButton}
 						onPress={() => handleFileDownload(message.content)}
 					>
-						<Text style={styles.downloadButtonText}>
-							{message.content}
-						</Text>
+						<Text style={styles.downloadButtonText}>{message.content}</Text>
 					</TouchableOpacity>
 				) : (
 					<Text
 						style={{
 							fontSize: 16,
-							color: message.isMyMessage ? 'white' : 'black',
+							color: isMyMessage ? 'white' : 'black',
 						}}
 					>
 						{message.content}
@@ -70,18 +67,10 @@ const Message = ({ message, sender, onPress }) => {
 				)}
 			</View>
 
-			{message.type !== 'notification' && !message.isRecalled && (
+			{!isNotification && !isRecalled && sender && (
 				<Image
-					source={{
-						uri: sender.profilePic,
-					}}
-					style={{
-						height: 20,
-						width: 20,
-						borderRadius: 20,
-						backgroundColor: 'white',
-						margin: 10,
-					}}
+					source={{ uri: sender.profilePic }}
+					style={styles.profilePic}
 				/>
 			)}
 		</View>
@@ -92,7 +81,7 @@ export default Message;
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1 + ' !important',
+		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-end',
@@ -144,5 +133,12 @@ const styles = StyleSheet.create({
 	downloadButtonText: {
 		color: 'white',
 		fontSize: 16,
+	},
+	profilePic: {
+		height: 20,
+		width: 20,
+		borderRadius: 20,
+		backgroundColor: 'white',
+		margin: 10,
 	},
 });
