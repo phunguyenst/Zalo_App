@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
 	user: InfoUserReducer,
 });
 
-console.log('rootReducer', rootReducer);
+
 const presistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
