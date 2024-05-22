@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  frontend:
+    image: phunguyenst/zalo-mobile:v1.0
+    ports:
+      - 2000:2000

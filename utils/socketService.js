@@ -1,10 +1,9 @@
 import io from 'socket.io-client';
-
 const socketService = {
 	socket: null,
 
 	initialize(userId) {
-		this.socket = io('http://localhost:5000', { query: { userId } });
+		this.socket = io(process.env["REACT_APP_BACKEND_PORT"], { query: { userId } });
 	},
 
 	onMessage(event, callback) {

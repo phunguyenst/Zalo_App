@@ -17,7 +17,6 @@ import otpApi from '../api/otpApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
 import Modal from 'react-native-modal';
-
 const screenWidth = Dimensions.get('window').width;
 const Login = ({ navigation }) => {
 	const [phone, setPhone] = useState('+84338630727');
@@ -95,8 +94,9 @@ const hideModal = () => {
 		}
 	};
 	const sendChangePasswordRequest = async (newPassword, phoneN) => {
+		console.log("process.env.BACKEND_PORT",process.env["REACT_APP_BACKEND_PORT"] );
 		try {
-			const res = await fetch('localhost:5000/api/user/change-password', {
+			const res = await fetch(`${process.env["REACT_APP_BACKEND_PORT"]}/api/user/change-password`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
