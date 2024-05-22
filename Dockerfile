@@ -26,7 +26,7 @@ FROM node:22-alpine
 WORKDIR /zalo-app/mobile
 
 # Copy the build output from the previous stage to the current stage
-COPY --from=build /zalo-app/mobile/build ./build
+COPY --from=build /zalo-app/mobile/web-build ./build
 
 # Install serve package to serve the built files
 RUN npm install -g serve
