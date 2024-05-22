@@ -38,5 +38,5 @@ EXPOSE 2000
 CMD ["serve", "-s", "build", "-l", "2000"]
 
 
-# docker build --tag car-docker . 
-# docker run -p 3001:3001 -d car-docker
+# docker build --tag zalo-docker .
+# docker run -p 2000:2000 -d zalo-docker
