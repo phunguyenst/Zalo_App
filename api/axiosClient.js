@@ -1,9 +1,9 @@
 import axios from 'axios';
 import queryString from 'query-string';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+console.log("processssss",process.env["REACT_APP_BACKEND_PORT"]);
 const axiosClient = axios.create({
-	baseURL: 'http://localhost:5000/api',
+	baseURL: process.env["REACT_APP_BACKEND_PORT"] + "/api",
 	headers: {
 		'Content-Type': 'application/json',
 	},
