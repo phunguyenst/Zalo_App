@@ -6,7 +6,7 @@ const initialState = {
 	listRequestAddFriendsReceived: [],
 	friends: [],
 };
-
+console.log('initialState', initialState);
 const userSlice = createSlice({
 	name: 'user',
 	initialState,
