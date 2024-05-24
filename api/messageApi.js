@@ -6,6 +6,7 @@ const messageApi = {
 		const config = {
 			headers: {
 				'content-type': 'multipart/form-data',
+				'Access-Control-Allow-Origin': '*',
 			},
 		};
 		return axiosClient.post(url, data, config);
