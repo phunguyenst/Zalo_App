@@ -47,7 +47,7 @@ const VerifierSignup = ({ navigation, route }) => {
             // Check if sign in was successful
             if (response.status === 200) {
                 // Navigate to Home or wherever you need after successful login
-                navigation.navigate('Home');
+                navigation.navigate('Login');
             } else {
                 // Handle sign in failure if needed
                 setError('Đăng nhập không thành công, vui lòng thử lại.');
