@@ -44,7 +44,6 @@ const SettingGroup = () => {
 		if (roleUser !== role) {
 			setRole(roleUser);
 		}
-		
 	}, [conversationDetails, profile.userID, role]);
 
 	useEffect(() => {
@@ -176,7 +175,7 @@ const SettingGroup = () => {
 	const closeModalDetailMember = useCallback(() => {
 		setDetailMemberInfo(false);
 	}, []);
-
+	console.log(conversationDetails);
 	return (
 		<View style={styles.container}>
 			<Image source={{ uri: conversationPic }} style={styles.avatar} />

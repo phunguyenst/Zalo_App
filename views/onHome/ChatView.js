@@ -80,8 +80,12 @@ const ChatView = ({ navigation, route }) => {
 													  )?.fullName
 											}
 											subtitle={
-												item.lastMessage?.content ||
-												'Chưa có tin nhắn nào'
+												!item.lastMessage?.content
+													? 'Chưa có tin nhắn nào'
+													: item.lastMessage?.type ===
+													  'file'
+													? 'Tập tin mới'
+													: item.lastMessage?.content
 											}
 											titleStyle={styles.cardTitle}
 										/>

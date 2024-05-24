@@ -136,6 +136,7 @@ const Navigator = () => {
 							name="AddFriendScreen"
 							component={AddFriendScreen}
 							options={{
+								title: 'Thêm bạn bè',
 								headerShown: true,
 							}}
 						/>
@@ -143,6 +144,7 @@ const Navigator = () => {
 							name="FriendInfo"
 							component={FriendInfo}
 							options={{
+								title: 'Thông tin cá nhân',
 								headerShown: true,
 							}}
 						/>
@@ -150,6 +152,7 @@ const Navigator = () => {
 							name="ShowRequestAddFriend"
 							component={ShowRequestAddFriend}
 							options={{
+								title: 'Danh sách lời mời kết bạn',
 								headerShown: true,
 							}}
 						/>
