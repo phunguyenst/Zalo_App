@@ -1,22 +1,16 @@
 import { useEffect } from 'react';
-import { useSocketContext } from '../views/socketContext';
+import { useSocket } from '../views/socketContext';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	addMessage,
-	recalledMessage,
-	selectMessages,
-} from '../views/slide/MessageSlide';
-import {
-	selectConversationSelected,
-	setHaveNewMessageConversations,
-} from '../views/slide/MessageSlide';
+import { addMessage, recalledMessage } from '../views/slide/MessageSlide';
+import { setHaveNewMessageConversations } from '../views/slide/MessageSlide';
 
 const useListenMessage = () => {
-	const { socket } = useSocketContext();
+	const { socket } = useSocket();
 	const dispatch = useDispatch();
-	const messages = useSelector(selectMessages);
-	const conversationSelected = useSelector(selectConversationSelected);
-
+	const messages = useSelector((state) => state.message.messages);
+	const conversationSelected = useSelector(
+		(state) => state.conservation?.conversationDetails
+	);
 	useEffect(() => {
 		const handleNewMessage = (newMessage) => {
 			console.log(newMessage);

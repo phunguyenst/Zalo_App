@@ -136,22 +136,31 @@ const SettingGroup = () => {
 			return;
 		}
 		try {
-			let otherOwner;
-			if (role.role === 'owner') {
+			let otherOwner = null;
+			console.log(
+				'12345678',
+				conversationDetails,
+				conversationDetails.participantIds.find(
+					(participant) =>
+						participant.participantId === profile.userID
+				)?.role
+			);
+			if (
+				conversationDetails.participantIds.find(
+					(participant) =>
+						participant.participantId === profile.userID
+				)?.role === 'owner'
+			) {
+				console.log('12345678');
 				otherOwner = conversationDetails.participantIds.find(
 					(participant) =>
 						participant.participantId !== profile.userID
-				);
-			} else {
-				otherOwner = conversationDetails.participantIds.find(
-					(participant) =>
-						participant.participantId === profile.userID
 				);
 			}
 			const res = await conversationApi.leaveGroup(
 				conversationDetails.conversationId,
 				profile.userID,
-				otherOwner
+				otherOwner.userID
 			);
 			if (res) {
 				navigation.navigate('Home');
