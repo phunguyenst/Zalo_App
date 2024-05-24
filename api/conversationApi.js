@@ -9,6 +9,7 @@ const conversationApi = {
 		const config = {
 			headers: {
 				'content-type': 'multipart/form-data',
+				'Access-Control-Allow-Origin': '*',
 			},
 		};
 		let formData = new FormData();
