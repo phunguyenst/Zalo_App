@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, AntDesign } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 
 const Message = ({ message, sender, onPress }) => {
-	const handleFileDownload = (fileUrl) => {
-		alert('Không thể download được file này');
+	const profile = useSelector((state) => state.profile.profile);
+	const handleFileDownload = () => {
+		alert(
+			'Bạn không thể tải được file này trên động, vui lòng dùng bản web'
+		);
 	};
 
 	const isNotification = message.type === 'notification';
@@ -36,7 +40,9 @@ const Message = ({ message, sender, onPress }) => {
 				]}
 			>
 				{isRecalled ? (
-					<Text style={styles.recalledMessage}>Tin nhắn đã bị thu hồi</Text>
+					<Text style={styles.recalledMessage}>
+						Tin nhắn đã bị thu hồi
+					</Text>
 				) : message.type === 'image' ? (
 					<View>
 						<Image
@@ -46,14 +52,17 @@ const Message = ({ message, sender, onPress }) => {
 					</View>
 				) : message.type === 'notification' ? (
 					<Text style={styles.notificationText}>
-						{`${message.senderFullName} ${message.content}`}
+						{`${message.senderFullName || 'Bạn'} ${
+							message.content
+						}`}
 					</Text>
 				) : message.type === 'file' ? (
 					<TouchableOpacity
 						style={styles.downloadButton}
 						onPress={() => handleFileDownload(message.content)}
 					>
-						<Text style={styles.downloadButtonText}>{message.content}</Text>
+						<AntDesign name="file1" size={20} color="white" />
+						<Text style={{ marginLeft: 10 }}>Tập tin</Text>
 					</TouchableOpacity>
 				) : (
 					<Text
@@ -67,7 +76,7 @@ const Message = ({ message, sender, onPress }) => {
 				)}
 			</View>
 
-			{!isNotification && !isRecalled && sender && (
+			{!isNotification && !isRecalled && sender && !isMyMessage && (
 				<Image
 					source={{ uri: sender.profilePic }}
 					style={styles.profilePic}
@@ -81,7 +90,6 @@ export default Message;
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'flex-end',
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		paddingVertical: 8,
 		borderRadius: 8,
-		maxWidth: '80%',
+		maxWidth: '60%',
 	},
 	myMessage: {
 		alignSelf: 'flex-end',
@@ -124,11 +132,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 	},
 	downloadButton: {
-		padding: 10,
-		backgroundColor: '#0066cc',
-		borderRadius: 5,
 		alignItems: 'center',
 		overflow: 'hidden',
+		flexDirection: 'row',
 	},
 	downloadButtonText: {
 		color: 'white',

@@ -31,7 +31,6 @@ const ModalAddMember = ({ isVisible, onClose, onConfirm }) => {
 
 		setCheckedFriends(newCheckedFriends);
 	};
-
 	const renderFriend = ({ item }) => {
 		if (
 			conversationDetails.participantIds.some(

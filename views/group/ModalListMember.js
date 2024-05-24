@@ -14,6 +14,7 @@ import { setConversationDetails } from '../slide/ConsevationSlide';
 
 const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 	const dispatch = useDispatch();
+	const profile = useSelector((state) => state.profile?.profile);
 
 	const conversationDetails = useSelector(
 		(state) => state.conservation?.conversationDetails
@@ -57,7 +58,20 @@ const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 			);
 			if (res) {
 				console.log('Remove member response: ', res);
-				navigation.navigate('ChatDetail')
+
+				const updatedMembersInfo =
+					conversationDetails.membersInfo.filter(
+						(member) => member.userID !== selectedMember.userID
+					);
+
+				const updatedConversationDetails = {
+					...conversationDetails,
+					membersInfo: updatedMembersInfo,
+				};
+
+				dispatch(setConversationDetails(updatedConversationDetails));
+
+				navigation.navigate('ChatDetail');
 			}
 		} catch (error) {
 			console.error('Error removing member: ', error);
@@ -79,17 +93,19 @@ const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 				/>
 				<Text style={styles.name}>{item.fullName}</Text>
 				<Text>
-					{
-						conversationDetails.participantIds.find(
-							(participant) =>
-								item.userID === participant.participantId
-						)?.role
-					}
+					{conversationDetails.participantIds.find(
+						(participant) =>
+							item.userID === participant.participantId
+					)?.role === 'owner'
+						? 'Nhóm trường'
+						: 'Thành viên'}
 				</Text>
 			</TouchableOpacity>
 		);
 	};
-
+	console.log('profile ', profile);
+	console.log('profile ', conversationDetails);
+	console.log('profile ', conversationDetails);
 	return (
 		<Modal
 			animationType="slide"
@@ -121,12 +137,17 @@ const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 						>
 							<Text>Xem chi tiết</Text>
 						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.optionButton}
-							onPress={handleSetLeader}
-						>
-							<Text>Chỉ định làm nhóm trưởng</Text>
-						</TouchableOpacity>
+						{conversationDetails.participantIds.find(
+							(participant) =>
+								participant.participantId === profile.userID
+						)?.role === 'owner' && (
+							<TouchableOpacity
+								style={styles.optionButton}
+								onPress={handleSetLeader}
+							>
+								<Text>Chỉ định làm nhóm trưởng</Text>
+							</TouchableOpacity>
+						)}
 						<TouchableOpacity
 							style={styles.optionButton}
 							onPress={() => {
@@ -158,13 +179,19 @@ const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 						</Text>
 						<View style={styles.buttonRow}>
 							<TouchableOpacity
-								style={styles.confirmButton}
+								style={[
+									styles.confirmButton,
+									{ backgroundColor: '#139afc' },
+								]}
 								onPress={handleRemoveMember}
 							>
 								<Text>Có</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								style={styles.confirmButton}
+								style={[
+									styles.confirmButton,
+									{ backgroundColor: 'gray' },
+								]}
 								onPress={() => setConfirmVisible(false)}
 							>
 								<Text>Không</Text>
@@ -264,8 +291,9 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	confirmButton: {
+		textAlign: 'center',
 		padding: 10,
-		backgroundColor: '#ddd',
 		borderRadius: 5,
+		minWidth: 50,
 	},
 });

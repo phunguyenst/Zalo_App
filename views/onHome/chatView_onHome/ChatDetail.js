@@ -36,11 +36,15 @@ const ChatDetail = ({ navigation }) => {
 
 		fetchData();
 
-        const unsubscribe = navigation.addListener('focus', fetchData);
+		const unsubscribe = navigation.addListener('focus', fetchData);
 
-        return unsubscribe;
-    }, [conversationDetails?.conversationId, profile.userID, dispatch, navigation]);
-
+		return unsubscribe;
+	}, [
+		conversationDetails?.conversationId,
+		profile.userID,
+		dispatch,
+		navigation,
+	]);
 	useEffect(() => {
 		if (socket) {
 			const handleNewMessage = (newMessage) => {
@@ -48,7 +52,7 @@ const ChatDetail = ({ navigation }) => {
 					...newMessage,
 					isMyMessage: newMessage.senderId === profile.userID,
 				};
-				dispatch(addMessage(updatedMessage)); // Giả sử bạn có action addMessage
+				dispatch(addMessage(updatedMessage));
 			};
 
 			socket.on('newMessage', handleNewMessage);

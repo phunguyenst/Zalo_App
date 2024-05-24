@@ -6,11 +6,12 @@ import {
 	TouchableOpacity,
 	FlatList,
 	ScrollView,
-	Button
+	Button,
 } from 'react-native';
 import { Avatar, Card } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+	setProfile,
 	setListRequestAddFriendsSent,
 	setListRequestAddFriendsReceived,
 } from '../views/slide/InfoUserSlide';
@@ -19,7 +20,9 @@ import Modal from 'react-native-modal';
 
 const ShowRequestAddFriend = ({ navigation }) => {
 	const sentRequests = useSelector((state) => state.user?.sentRequests);
-	const receivedRequests = useSelector((state) => state.user?.receivedRequests);
+	const receivedRequests = useSelector(
+		(state) => state.user?.receivedRequests
+	);
 	const [selectedTab, setSelectedTab] = useState('Đã nhận');
 	const dispatch = useDispatch();
 	const profile = useSelector((state) => state.profile.profile);
@@ -41,24 +44,6 @@ const ShowRequestAddFriend = ({ navigation }) => {
 		}
 	};
 
-	useEffect(() => {
-		const fetchRequests = async () => {
-			try {
-				const response = await userApi.getFriendRequests(profile?.userID);
-				dispatch(setListRequestAddFriendsSent(response.sentRequests));
-				dispatch(setListRequestAddFriendsReceived(response.receivedRequests));
-			} catch (error) {
-				console.error('Error fetching friend requests:', error);
-			}
-		};
-		fetchRequests();
-		const unsubscribe = navigation.addListener('focus', () => {
-			fetchRequests();
-		});
-
-		return unsubscribe;
-	}, [dispatch, profile?.userID, navigation]);
-
 	const handleAddFriend = async (friendId) => {
 		try {
 			await userApi.addFriend(profile?.userID, friendId);
@@ -72,7 +57,9 @@ const ShowRequestAddFriend = ({ navigation }) => {
 	const handleCancelFriend = async (friendId) => {
 		try {
 			await userApi.cancelRequestAddFriends(profile?.userID, friendId);
-			showToast('huỷ yêu cầu kết bạn thành công', () => navigation.navigate('Home'));
+			showToast('huỷ yêu cầu kết bạn thành công', () =>
+				navigation.navigate('Home')
+			);
 		} catch (error) {
 			console.error('Error when canceling friend request:', error);
 			showToast('huỷ yêu cầu kết bạn thất bại');
@@ -106,6 +93,7 @@ const ShowRequestAddFriend = ({ navigation }) => {
 							width: '50%',
 							alignItems: 'center',
 							marginTop: 10,
+
 							borderBottomWidth: selectedTab === 'Đã gửi' ? 2 : 0,
 							borderBottomColor:
 								selectedTab === 'Đã gửi'
@@ -123,97 +111,164 @@ const ShowRequestAddFriend = ({ navigation }) => {
 							<View style={{ flex: 8 }}>
 								<FlatList
 									data={sentRequests}
-									renderItem={({ item }) => (
-										<View>
-											<View style={styles.headerContainer}>
-												<Text style={styles.headerText}>
-													{item.user.fullName}
-												</Text>
-											</View>
-
-											<Card.Title
-												title={item.user.fullName}
-												left={(props) => (
-													<Avatar.Image
-														size={55}
-														source={{
-															uri: item.user.profilePic,
-														}}
-														style={{ marginRight: 10 }}
-													/>
-												)}
-												right={(props) => (
-													<View style={{ flexDirection: 'row' }}>
-														<TouchableOpacity
-															onPress={() => handleCancelFriend(item.user.userID)}
-															style={styles.cancelButton}
+									renderItem={({ item }) => {
+										return (
+											<View>
+												<Card.Title
+													title={item.user.fullName}
+													left={(props) => (
+														<Avatar.Image
+															size={55}
+															source={{
+																uri: item.user
+																	.profilePic,
+															}}
+															style={{
+																marginRight: 10,
+															}}
+														/>
+													)}
+													right={(props) => (
+														<View
+															style={{
+																flexDirection:
+																	'row',
+															}}
 														>
-															<Text style={styles.buttonText}>
-																thu hồi
-															</Text>
-														</TouchableOpacity>
-													</View>
-												)}
-											/>
-										</View>
-									)}
+															<TouchableOpacity
+																style={{
+																	borderRadius: 10,
+																	backgroundColor:
+																		'grey',
+																	padding: 5,
+																	margin: 5,
+																	height: 35,
+																	width: 70,
+																	alignItems:
+																		'center',
+																	justifyContent:
+																		'center',
+																}}
+																onPress={() =>
+																	handleCancelFriend(
+																		item
+																			.user
+																			.userID
+																	)
+																}
+															>
+																<Text
+																	style={{
+																		backgroundColor:
+																			'#139afc',
+																		padding: 10,
+																		borderRadius: 10,
+																	}}
+																>
+																	Thu hồi
+																</Text>
+															</TouchableOpacity>
+														</View>
+													)}
+												/>
+											</View>
+										);
+									}}
 								/>
 							</View>
 						</View>
 					) : (
-						<View style={{ flex: 1 }}>
+						<View>
 							<View style={{ flex: 8 }}>
 								<FlatList
 									data={receivedRequests}
-									renderItem={({ item }) => (
-										<View>
-											<View style={styles.headerContainer}>
-												<Text style={styles.headerText}>
-													{item.user.fullName}
-												</Text>
-											</View>
-
-											<Card.Title
-												title={item.user.fullName}
-												left={(props) => (
+									renderItem={({ item }) => {
+										return (
+											<View style={styles.cardContainer}>
+												<View
+													style={
+														styles.avatarContainer
+													}
+												>
 													<Avatar.Image
 														size={55}
 														source={{
-															uri: item.user.profilePic,
+															uri: item.user
+																.profilePic,
 														}}
-														style={{ marginRight: 10 }}
 													/>
-												)}
-												right={(props) => (
-													<View style={{ flexDirection: 'row' }}>
+												</View>
+												<View
+													style={styles.infoContainer}
+												>
+													<Text
+														style={styles.userName}
+													>
+														{item.user.fullName}
+													</Text>
+													<View
+														style={
+															styles.buttonContainer
+														}
+													>
 														<TouchableOpacity
-															onPress={() => handleAddFriend(item.user.userID)}
-															style={styles.acceptButton}
+															style={[
+																styles.button,
+																{
+																	backgroundColor:
+																		'#139afc',
+																},
+															]}
+															onPress={() =>
+																handleAddFriend(
+																	item.user
+																		.userID
+																)
+															}
 														>
-															<Text style={styles.buttonText}>
-																đồng ý kết bạn
+															<Text
+																style={{
+																	color: 'white',
+																}}
+															>
+																Đồng ý
 															</Text>
 														</TouchableOpacity>
 														<TouchableOpacity
-															onPress={() => handleCancelFriend(item.user.userID)}
-															style={styles.cancelButton}
+															style={[
+																styles.button,
+																{
+																	backgroundColor:
+																		'white',
+																},
+															]}
+															onPress={() =>
+																handleCancelFriend(
+																	item.user
+																		.userID
+																)
+															}
 														>
-															<Text style={styles.buttonText}>
-																huỷ
+															<Text
+																style={{
+																	color: 'red',
+																}}
+															>
+																Hủy
 															</Text>
 														</TouchableOpacity>
 													</View>
-												)}
-											/>
-										</View>
-									)}
+												</View>
+											</View>
+										);
+									}}
 								/>
 							</View>
 						</View>
 					)}
 				</View>
 				<Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
-					<View style={{backgroundColor: 'white', padding: 20}}>
+					<View style={{ backgroundColor: 'white', padding: 20 }}>
 						<Text>{modalMessage}</Text>
 						<Button title="Close" onPress={hideModal} />
 					</View>
@@ -223,40 +278,38 @@ const ShowRequestAddFriend = ({ navigation }) => {
 	);
 };
 
+export default ShowRequestAddFriend;
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
-	headerContainer: {
+	cardContainer: {
+		flexDirection: 'row',
 		padding: 10,
+		alignItems: 'flex-start',
 	},
-	headerText: {
-		fontSize: 18,
+	avatarContainer: {
+		marginRight: 10,
+	},
+	infoContainer: {
+		flex: 1,
+	},
+	userName: {
+		fontSize: 16,
 		fontWeight: 'bold',
+		marginBottom: 5,
 	},
-	acceptButton: {
+	buttonContainer: {
+		flexDirection: 'row',
+	},
+	button: {
 		borderRadius: 10,
-		backgroundColor: 'green',
 		padding: 5,
 		margin: 5,
 		height: 35,
 		width: 70,
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	cancelButton: {
-		borderRadius: 10,
-		backgroundColor: 'grey',
-		padding: 5,
-		margin: 5,
-		height: 35,
-		width: 70,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	buttonText: {
-		color: 'white',
 	},
 });
-
-export default ShowRequestAddFriend;
