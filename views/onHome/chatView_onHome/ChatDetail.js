@@ -7,15 +7,16 @@ import ChatInput from '../chatView_onHome/ChatInput';
 import MessagesList from '../chatView_onHome/MessagesList';
 import messageApi from '../../../api/messageApi';
 import { useSocket } from '../../socketContext';
+import useListenMessage from '../../../hooks/useListenMessage';
 
 const ChatDetail = ({ navigation }) => {
-	const socket = useSocket();
+	const { socket } = useSocket();
 	const conversationDetails = useSelector(
 		(state) => state.conservation?.conversationDetails
 	);
 	const profile = useSelector((state) => state.profile.profile);
 	const dispatch = useDispatch();
-
+	useListenMessage();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {

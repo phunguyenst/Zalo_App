@@ -7,12 +7,20 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
+	const [onlineUsers, setOnlineUsers] = useState([]);
 	const profile = useSelector((state) => state.profile.profile);
 
 	useEffect(() => {
 		if (profile) {
-			socketService.initialize(profile.userID); // Cập nhật với userId cần thiết
+			socketService.initialize(profile.userID); // Initialize with userId
 			setSocket(socketService.socket);
+
+			// Set up the event listener for getOnlineUsers
+			socketService.onMessage('getOnlineUsers', (users) => {
+				setOnlineUsers(
+					users.filter((_user) => _user !== profile.userID)
+				);
+			});
 		}
 
 		return () => {
@@ -20,9 +28,8 @@ export const SocketProvider = ({ children }) => {
 			socketService.disconnect();
 		};
 	}, [profile]);
-
 	return (
-		<SocketContext.Provider value={socket}>
+		<SocketContext.Provider value={{ socket, onlineUsers }}>
 			{children}
 		</SocketContext.Provider>
 	);

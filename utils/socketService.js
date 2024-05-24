@@ -4,7 +4,9 @@ const socketService = {
 	socket: null,
 
 	initialize(userId) {
-		this.socket = io(REACT_APP_BACKEND_PORT, { query: { userId } });
+		this.socket = io(REACT_APP_BACKEND_PORT || 'http://localhost:5000', {
+			query: { userId },
+		});
 	},
 
 	onMessage(event, callback) {
