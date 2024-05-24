@@ -1,9 +1,10 @@
 import axios from 'axios';
 import queryString from 'query-string';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-console.log("processssss",process.env["REACT_APP_BACKEND_PORT"]);
+import { REACT_APP_BACKEND_PORT } from '@env';
+console.log("processssss",REACT_APP_BACKEND_PORT);
 const axiosClient = axios.create({
-	baseURL: process.env["REACT_APP_BACKEND_PORT"] + "/api",
+	baseURL: REACT_APP_BACKEND_PORT + "/api",
 	headers: {
 		'Content-Type': 'application/json',
 		'Access-Control-Allow-Origin': '*',

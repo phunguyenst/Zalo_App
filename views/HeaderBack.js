@@ -56,7 +56,6 @@ const HeaderBack = () => {
 						borderWidth: 0,
 						width: '100%',
 						color: 'white',
-						outlineWidth: 0,
 					}}
 					placeholderTextColor="white"
 					value={searchValue}

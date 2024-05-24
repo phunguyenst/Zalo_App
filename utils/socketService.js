@@ -1,9 +1,10 @@
 import io from 'socket.io-client';
+import { REACT_APP_BACKEND_PORT } from '@env';
 const socketService = {
 	socket: null,
 
 	initialize(userId) {
-		this.socket = io(process.env["REACT_APP_BACKEND_PORT"], { query: { userId } });
+		this.socket = io(REACT_APP_BACKEND_PORT, { query: { userId } });
 	},
 
 	onMessage(event, callback) {
