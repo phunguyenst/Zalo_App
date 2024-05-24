@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   frontend:
     image: phunguyenst/zalo-mobile:v1.0
