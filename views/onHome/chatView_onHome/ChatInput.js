@@ -156,7 +156,6 @@ const ChatInput = () => {
 							color: 'black',
 							fontSize: 16,
 							alignSelf: 'center',
-							outlineWidth: 0,
 							padding: 10,
 							flex: 1,
 						}}

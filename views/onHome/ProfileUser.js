@@ -128,7 +128,7 @@ const AccountView = () => {
 											<Card.Title
 												title={userData.fullName}
 												subtitleStyle={{ fontSize: 15 }}
-												titleStyle={{ color: 'black', fontSize: "bold" }}
+												titleStyle={{ color: 'black', fontSize: 16 }}
 											/>
 										</View>
 									</View>

@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import conversationApi from '../../api/conversationApi';
 import { setConversationDetails } from '../slide/ConsevationSlide';
 
-const ModalListMember = ({ isVisible, onClose, onClickMember }) => {
+const ModalListMember = ({ isVisible, onClose, onClickMember, navigation }) => {
 	const dispatch = useDispatch();
 
 	const conversationDetails = useSelector(
@@ -57,6 +57,7 @@ const ModalListMember = ({ isVisible, onClose, onClickMember }) => {
 			);
 			if (res) {
 				console.log('Remove member response: ', res);
+				navigation.navigate('ChatDetail')
 			}
 		} catch (error) {
 			console.error('Error removing member: ', error);

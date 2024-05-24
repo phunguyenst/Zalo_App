@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/authApi';
 import Modal from 'react-native-modal';
 const screenWidth = Dimensions.get('window').width;
+import { REACT_APP_BACKEND_PORT } from '@env';
 const Login = ({ navigation }) => {
 	const [phone, setPhone] = useState('+84338630727');
 	const [password, setPassword] = useState('');
@@ -32,16 +33,16 @@ const Login = ({ navigation }) => {
 	const [newPassword, setNewPassword] = useState('');
 
 	const [isModalVisible, setModalVisible] = useState(false);
-const [modalMessage, setModalMessage] = useState('');
+	const [modalMessage, setModalMessage] = useState('');
 
-const showToast = (message) => {
-  setModalMessage(message);
-  setModalVisible(true);
-};
+	const showToast = (message) => {
+		setModalMessage(message);
+		setModalVisible(true);
+	};
 
-const hideModal = () => {
-  setModalVisible(false);
-};
+	const hideModal = () => {
+		setModalVisible(false);
+	};
 
 	const handleLogin = async () => {
 		try {
@@ -94,9 +95,9 @@ const hideModal = () => {
 		}
 	};
 	const sendChangePasswordRequest = async (newPassword, phoneN) => {
-		console.log("process.env.BACKEND_PORT",process.env["REACT_APP_BACKEND_PORT"] );
+		console.log("process.env.BACKEND_PORT", REACT_APP_BACKEND_PORT);
 		try {
-			const res = await fetch(`${process.env["REACT_APP_BACKEND_PORT"]}/api/user/change-password`, {
+			const res = await fetch(`${REACT_APP_BACKEND_PORT}/api/user/change-password`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ const hideModal = () => {
 			setShowModalForgetPassword(false);
 		}
 	};
-	
+
 
 	return (
 		<PaperProvider>
@@ -199,7 +200,15 @@ const hideModal = () => {
 									top: 10,
 								}}
 							/>
+
 						</View>
+						<TouchableOpacity onPress={sendVerification}>
+							<View style={{ marginTop: 10 }}>
+								<Text style={{ textAlign: 'center', color: 'blue' }}>
+									Quên mật khẩu?
+								</Text>
+							</View>
+						</TouchableOpacity>
 						{loginError && (
 							<Text style={{ color: 'red' }}>
 								{loginErrorMessage}
@@ -234,13 +243,7 @@ const hideModal = () => {
 						</Text>
 					</View>
 				</TouchableOpacity> */}
-				<TouchableOpacity onPress={sendVerification}>
-					<View style={{ marginTop: 30, flex: 1 }}>
-						<Text styles={{ textAlign: 'center', color: 'blue' }}>
-							Quên mật khẩu?
-						</Text>
-					</View>
-				</TouchableOpacity>
+
 				<View
 					style={{
 						flex: 1,
@@ -316,11 +319,11 @@ const hideModal = () => {
 					</Dialog>
 				</Portal>
 				<Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
-    <View style={{backgroundColor: 'white', padding: 20}}>
-      <Text>{modalMessage}</Text>
-      <Button title="Close" onPress={hideModal} />
-    </View>
-  </Modal>
+					<View style={{ backgroundColor: 'white', padding: 20 }}>
+						<Text>{modalMessage}</Text>
+						<Button title="Close" onPress={hideModal} />
+					</View>
+				</Modal>
 			</View>
 		</PaperProvider>
 	);

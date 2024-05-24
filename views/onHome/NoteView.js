@@ -21,7 +21,7 @@ const NoteView = () => {
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
               <Image
                 source={require("../onHome/image_view/image_avt.jpg")}
-                style={{ height: 50, width: 50, borderRadius: "50%" }}
+                style={{ height: 50, width: 50, borderRadius: 25 }}
                 resizeMode='cover'
               ></Image>
               <TouchableOpacity
@@ -151,7 +151,7 @@ const NoteView = () => {
               <View style={{ flexDirection: "column" }}>
                 <Image
                   source={require("../onHome/image_view/shiba_avt.jpg")}
-                  style={{ height: 40, width: 40, borderRadius: "50%" }}
+                  style={{ height: 40, width: 40, borderRadius: 25 }}
                   resizeMode='cover'
                 ></Image>
               </View>
